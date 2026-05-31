@@ -1,0 +1,1095 @@
+{
+  "generated_at": "2026-05-30T23:44:25",
+  "files": {
+    "product_food": "datasets/product-database/food.parquet",
+    "product_beauty": "datasets/product-database/beauty.parquet",
+    "prices": "datasets/open-prices/prices.parquet"
+  },
+  "products": {
+    "schema": {
+      "path": "datasets/product-database/food.parquet",
+      "file_size_bytes": 7505261379,
+      "columns": 111,
+      "schema": {
+        "additives_n": "Int32",
+        "additives_tags": "List(String)",
+        "allergens_tags": "List(String)",
+        "brands_tags": "List(String)",
+        "brands": "String",
+        "categories": "String",
+        "categories_tags": "List(String)",
+        "categories_properties": "Struct({'ciqual_food_code': Int32, 'agribalyse_food_code': Int32, 'agribalyse_proxy_food_code': Int32})",
+        "checkers_tags": "List(String)",
+        "ciqual_food_name_tags": "List(String)",
+        "cities_tags": "List(String)",
+        "code": "String",
+        "compared_to_category": "String",
+        "complete": "Int32",
+        "completeness": "Float32",
+        "correctors_tags": "List(String)",
+        "countries_tags": "List(String)",
+        "created_t": "Int64",
+        "creator": "String",
+        "data_quality_errors_tags": "List(String)",
+        "data_quality_info_tags": "List(String)",
+        "data_quality_warnings_tags": "List(String)",
+        "data_sources_tags": "List(String)",
+        "environmental_score_data": "String",
+        "environmental_score_grade": "String",
+        "environmental_score_score": "Int32",
+        "environmental_score_tags": "List(String)",
+        "editors": "List(String)",
+        "emb_codes_tags": "List(String)",
+        "emb_codes": "String",
+        "entry_dates_tags": "List(String)",
+        "food_groups_tags": "List(String)",
+        "generic_name": "List(Struct({'lang': String, 'text': String}))",
+        "images": "List(Struct({'key': String, 'imgid': Int32, 'rev': Int32, 'sizes': Struct({'100': Struct({'h': Int32, 'w': Int32}), '200': Struct({'h': Int32, 'w': Int32}), '400': Struct({'h': Int32, 'w': Int32}), 'full': Struct({'h': Int32, 'w': Int32})}), 'uploaded_t': Int64, 'uploader': String}))",
+        "informers_tags": "List(String)",
+        "ingredients_analysis_tags": "List(String)",
+        "ingredients_from_palm_oil_n": "Int32",
+        "ingredients_n": "Int32",
+        "ingredients_original_tags": "List(String)",
+        "ingredients_percent_analysis": "Int32",
+        "ingredients_tags": "List(String)",
+        "ingredients_text": "List(Struct({'lang': String, 'text': String}))",
+        "ingredients_with_specified_percent_n": "Int32",
+        "ingredients_with_unspecified_percent_n": "Int32",
+        "ingredients_without_ciqual_codes_n": "Int32",
+        "ingredients_without_ciqual_codes": "List(String)",
+        "ingredients": "String",
+        "known_ingredients_n": "Int32",
+        "labels_tags": "List(String)",
+        "labels": "String",
+        "lang": "String",
+        "languages_tags": "List(String)",
+        "last_edit_dates_tags": "List(String)",
+        "last_editor": "String",
+        "last_image_t": "Int64",
+        "last_modified_by": "String",
+        "last_modified_t": "Int64",
+        "last_updated_t": "Int64",
+        "link": "String",
+        "main_countries_tags": "List(String)",
+        "manufacturing_places_tags": "List(String)",
+        "manufacturing_places": "String",
+        "max_imgid": "Int32",
+        "minerals_tags": "List(String)",
+        "misc_tags": "List(String)",
+        "new_additives_n": "Int32",
+        "no_nutrition_data": "Boolean",
+        "nova_group": "Int32",
+        "nova_groups_tags": "List(String)",
+        "nova_groups": "String",
+        "nucleotides_tags": "List(String)",
+        "nutrient_levels_tags": "List(String)",
+        "nutriments": "List(Struct({'name': String, 'value': Float32, '100g': Float32, 'serving': Float32, 'unit': String, 'prepared_value': Float32, 'prepared_100g': Float32, 'prepared_serving': Float32, 'prepared_unit': String}))",
+        "nutriscore_grade": "String",
+        "nutriscore_score": "Int32",
+        "nutrition_data_per": "String",
+        "obsolete": "Boolean",
+        "origins_tags": "List(String)",
+        "origins": "String",
+        "owner_fields": "List(Struct({'field_name': String, 'timestamp': Int64}))",
+        "owner": "String",
+        "packagings_complete": "Boolean",
+        "packaging_recycling_tags": "List(String)",
+        "packaging_shapes_tags": "List(String)",
+        "packaging_tags": "List(String)",
+        "packaging_text": "List(Struct({'lang': String, 'text': String}))",
+        "packaging": "String",
+        "packagings": "List(Struct({'material': String, 'number_of_units': Int64, 'quantity_per_unit': String, 'quantity_per_unit_unit': String, 'quantity_per_unit_value': String, 'recycling': String, 'shape': String, 'weight_measured': Float32}))",
+        "photographers": "List(String)",
+        "popularity_key": "Int64",
+        "popularity_tags": "List(String)",
+        "product_name": "List(Struct({'lang': String, 'text': String}))",
+        "product_quantity_unit": "String",
+        "product_quantity": "String",
+        "purchase_places_tags": "List(String)",
+        "quantity": "String",
+        "rev": "Int32",
+        "scans_n": "Int32",
+        "serving_quantity": "String",
+        "serving_size": "String",
+        "states_tags": "List(String)",
+        "stores_tags": "List(String)",
+        "stores": "String",
+        "traces_tags": "List(String)",
+        "unique_scans_n": "Int32",
+        "unknown_ingredients_n": "Int32",
+        "unknown_nutrients_tags": "List(String)",
+        "vitamins_tags": "List(String)",
+        "with_non_nutritive_sweeteners": "Int32",
+        "with_sweeteners": "Int32",
+        "schema_version": "Int32"
+      }
+    },
+    "food_rows": 4503112,
+    "beauty_rows": 62829,
+    "required_fields": {
+      "identity": {
+        "code": true,
+        "product_name": true,
+        "brands": true,
+        "brands_tags": true
+      },
+      "geography": {
+        "countries_tags": true,
+        "main_countries_tags": true
+      },
+      "category": {
+        "categories": true,
+        "categories_tags": true,
+        "food_groups_tags": true
+      },
+      "health": {
+        "nutriscore_grade": true,
+        "nutriscore_score": true,
+        "nova_group": true,
+        "nova_groups_tags": true,
+        "nutrient_levels_tags": true,
+        "nutriments": true
+      },
+      "label_transparency": {
+        "labels_tags": true,
+        "ingredients_text": true,
+        "completeness": true,
+        "data_quality_warnings_tags": true,
+        "data_quality_errors_tags": true
+      },
+      "popularity": {
+        "scans_n": true,
+        "unique_scans_n": true,
+        "popularity_tags": true
+      }
+    },
+    "coverage": {
+      "code": {
+        "present_rows": 4503112,
+        "coverage_pct": 100.0
+      },
+      "product_name": {
+        "present_rows": 4225579,
+        "coverage_pct": 93.84
+      },
+      "brands": {
+        "present_rows": 2929498,
+        "coverage_pct": 65.05
+      },
+      "brands_tags": {
+        "present_rows": 2821703,
+        "coverage_pct": 62.66
+      },
+      "countries_tags": {
+        "present_rows": 4480278,
+        "coverage_pct": 99.49
+      },
+      "main_countries_tags": {
+        "present_rows": 0,
+        "coverage_pct": 0.0
+      },
+      "categories": {
+        "present_rows": 1978882,
+        "coverage_pct": 43.94
+      },
+      "categories_tags": {
+        "present_rows": 1835456,
+        "coverage_pct": 40.76
+      },
+      "food_groups_tags": {
+        "present_rows": 1437227,
+        "coverage_pct": 31.92
+      },
+      "nutriscore_grade": {
+        "present_rows": 4458976,
+        "coverage_pct": 99.02
+      },
+      "nutriscore_score": {
+        "present_rows": 1361245,
+        "coverage_pct": 30.23
+      },
+      "nova_group": {
+        "present_rows": 1121732,
+        "coverage_pct": 24.91
+      },
+      "nova_groups_tags": {
+        "present_rows": 4459002,
+        "coverage_pct": 99.02
+      },
+      "nutrient_levels_tags": {
+        "present_rows": 1514625,
+        "coverage_pct": 33.64
+      },
+      "nutriments": {
+        "present_rows": 3491944,
+        "coverage_pct": 77.55
+      },
+      "labels_tags": {
+        "present_rows": 1221619,
+        "coverage_pct": 27.13
+      },
+      "ingredients_text": {
+        "present_rows": 1274913,
+        "coverage_pct": 28.31
+      },
+      "completeness": {
+        "present_rows": 4503093,
+        "coverage_pct": 100.0
+      },
+      "data_quality_warnings_tags": {
+        "present_rows": 4451963,
+        "coverage_pct": 98.86
+      },
+      "data_quality_errors_tags": {
+        "present_rows": 171482,
+        "coverage_pct": 3.81
+      },
+      "scans_n": {
+        "present_rows": 1558962,
+        "coverage_pct": 34.62
+      },
+      "unique_scans_n": {
+        "present_rows": 1558962,
+        "coverage_pct": 34.62
+      }
+    },
+    "derived_quality": {
+      "valid_nutriscore_grade_a_to_e": {
+        "present_rows": 1361245,
+        "coverage_pct": 30.23
+      },
+      "usable_nutrition_score": {
+        "present_rows": 1361245,
+        "coverage_pct": 30.23
+      },
+      "has_country_and_category": {
+        "present_rows": 1828253,
+        "coverage_pct": 40.6
+      },
+      "has_country_category_and_brand": {
+        "present_rows": 1462039,
+        "coverage_pct": 32.47
+      },
+      "completeness_at_least_0_5": {
+        "present_rows": 1217400,
+        "coverage_pct": 27.03
+      }
+    },
+    "nutrient_coverage": {
+      "energy-kcal": {
+        "present_rows": 3285545,
+        "coverage_pct": 72.96
+      },
+      "energy-kj": {
+        "present_rows": 2288073,
+        "coverage_pct": 50.81
+      },
+      "fat": {
+        "present_rows": 3257271,
+        "coverage_pct": 72.33
+      },
+      "saturated-fat": {
+        "present_rows": 3021283,
+        "coverage_pct": 67.09
+      },
+      "carbohydrates": {
+        "present_rows": 3260310,
+        "coverage_pct": 72.4
+      },
+      "sugars": {
+        "present_rows": 3079604,
+        "coverage_pct": 68.39
+      },
+      "fiber": {
+        "present_rows": 1737405,
+        "coverage_pct": 38.58
+      },
+      "proteins": {
+        "present_rows": 3261953,
+        "coverage_pct": 72.44
+      },
+      "salt": {
+        "present_rows": 2847956,
+        "coverage_pct": 63.24
+      },
+      "sodium": {
+        "present_rows": 2847958,
+        "coverage_pct": 63.24
+      },
+      "nova-group": {
+        "present_rows": 1069414,
+        "coverage_pct": 23.75
+      },
+      "nutrition-score-fr": {
+        "present_rows": 412623,
+        "coverage_pct": 9.16
+      }
+    },
+    "numeric_summary": {
+      "completeness": {
+        "min": 0.0,
+        "median": 0.375,
+        "mean": 0.41507720947265625,
+        "p95": 0.800000011920929,
+        "p99": 0.987500011920929,
+        "max": 1.100000023841858
+      },
+      "nutriscore_score": {
+        "min": -17,
+        "median": 11.0,
+        "mean": 10.993570591627517,
+        "p95": 29.0,
+        "p99": 34.0,
+        "max": 55
+      },
+      "nova_group": {
+        "min": 1,
+        "median": 4.0,
+        "mean": 3.343628424614792,
+        "p95": 4.0,
+        "p99": 4.0,
+        "max": 4
+      },
+      "scans_n": {
+        "min": 1,
+        "median": 2.0,
+        "mean": 3.994547012691778,
+        "p95": 11.0,
+        "p99": 40.0,
+        "max": 3685
+      },
+      "unique_scans_n": {
+        "min": 1,
+        "median": 1.0,
+        "mean": 3.2988289644006716,
+        "p95": 9.0,
+        "p99": 37.0,
+        "max": 3410
+      }
+    },
+    "top_countries_tags": [
+      {
+        "value": "en:france",
+        "count": 1232024
+      },
+      {
+        "value": "en:united-states",
+        "count": 911563
+      },
+      {
+        "value": "en:germany",
+        "count": 407928
+      },
+      {
+        "value": "en:spain",
+        "count": 353680
+      },
+      {
+        "value": "en:italy",
+        "count": 266117
+      },
+      {
+        "value": "en:united-kingdom",
+        "count": 186164
+      },
+      {
+        "value": "en:canada",
+        "count": 119730
+      },
+      {
+        "value": "en:switzerland",
+        "count": 103315
+      },
+      {
+        "value": "en:belgium",
+        "count": 99393
+      },
+      {
+        "value": "en:ireland",
+        "count": 78530
+      },
+      {
+        "value": "en:netherlands",
+        "count": 75573
+      },
+      {
+        "value": "en:australia",
+        "count": 73356
+      },
+      {
+        "value": "en:world",
+        "count": 72900
+      },
+      {
+        "value": "en:japan",
+        "count": 39503
+      },
+      {
+        "value": "en:romania",
+        "count": 37683
+      },
+      {
+        "value": "en:poland",
+        "count": 34547
+      },
+      {
+        "value": "en:russia",
+        "count": 34442
+      },
+      {
+        "value": "en:brazil",
+        "count": 33876
+      },
+      {
+        "value": "en:norway",
+        "count": 25598
+      },
+      {
+        "value": "en:sweden",
+        "count": 25101
+      }
+    ],
+    "top_categories_tags": [
+      {
+        "value": "en:plant-based-foods-and-beverages",
+        "count": 541063
+      },
+      {
+        "value": "en:plant-based-foods",
+        "count": 472186
+      },
+      {
+        "value": "en:snacks",
+        "count": 328178
+      },
+      {
+        "value": "en:sweet-snacks",
+        "count": 241267
+      },
+      {
+        "value": "en:beverages",
+        "count": 225166
+      },
+      {
+        "value": "en:dairies",
+        "count": 171923
+      },
+      {
+        "value": "en:cereals-and-potatoes",
+        "count": 163488
+      },
+      {
+        "value": "en:meats-and-their-products",
+        "count": 147207
+      },
+      {
+        "value": "en:fermented-foods",
+        "count": 133395
+      },
+      {
+        "value": "en:fermented-milk-products",
+        "count": 128558
+      },
+      {
+        "value": "en:fruits-and-vegetables-based-foods",
+        "count": 121776
+      },
+      {
+        "value": "en:condiments",
+        "count": 120749
+      },
+      {
+        "value": "en:beverages-and-beverages-preparations",
+        "count": 109860
+      },
+      {
+        "value": "en:meats",
+        "count": 107793
+      },
+      {
+        "value": "en:desserts",
+        "count": 105312
+      },
+      {
+        "value": "en:cereals-and-their-products",
+        "count": 103019
+      },
+      {
+        "value": "en:biscuits-and-cakes",
+        "count": 102795
+      },
+      {
+        "value": "en:meals",
+        "count": 102640
+      },
+      {
+        "value": "en:spreads",
+        "count": 89716
+      },
+      {
+        "value": "en:confectioneries",
+        "count": 84415
+      }
+    ],
+    "top_brands_tags": [
+      {
+        "value": "xx:carrefour",
+        "count": 24210
+      },
+      {
+        "value": "xx:lidl",
+        "count": 18987
+      },
+      {
+        "value": "xx:coop",
+        "count": 17137
+      },
+      {
+        "value": "xx:u",
+        "count": 16221
+      },
+      {
+        "value": "xx:aldi",
+        "count": 15411
+      },
+      {
+        "value": "xx:nestle",
+        "count": 14294
+      },
+      {
+        "value": "xx:auchan",
+        "count": 12438
+      },
+      {
+        "value": "xx:bonarea",
+        "count": 12326
+      },
+      {
+        "value": "xx:hacendado",
+        "count": 11421
+      },
+      {
+        "value": "xx:tesco",
+        "count": 9941
+      },
+      {
+        "value": "xx:delhaize",
+        "count": 9706
+      },
+      {
+        "value": "xx:migros",
+        "count": 9209
+      },
+      {
+        "value": "xx:spar",
+        "count": 7931
+      },
+      {
+        "value": "xx:marque-repere",
+        "count": 7784
+      },
+      {
+        "value": "xx:albert-heijn",
+        "count": 7766
+      },
+      {
+        "value": "xx:jumbo",
+        "count": 7449
+      },
+      {
+        "value": "xx:sainsbury-s",
+        "count": 6639
+      },
+      {
+        "value": "xx:casino",
+        "count": 6618
+      },
+      {
+        "value": "xx:leader-price",
+        "count": 5876
+      },
+      {
+        "value": "xx:asda",
+        "count": 5740
+      }
+    ],
+    "top_nutriscore_grade": [
+      {
+        "value": "unknown",
+        "count": 2998756
+      },
+      {
+        "value": "e",
+        "count": 383066
+      },
+      {
+        "value": "d",
+        "count": 341156
+      },
+      {
+        "value": "c",
+        "count": 282390
+      },
+      {
+        "value": "a",
+        "count": 197952
+      },
+      {
+        "value": "b",
+        "count": 156681
+      },
+      {
+        "value": "not-applicable",
+        "count": 98975
+      }
+    ],
+    "top_nova_group": [
+      {
+        "value": 4,
+        "count": 716524
+      },
+      {
+        "value": 3,
+        "count": 207796
+      },
+      {
+        "value": 1,
+        "count": 133653
+      },
+      {
+        "value": 2,
+        "count": 63759
+      }
+    ]
+  },
+  "prices": {
+    "schema": {
+      "path": "datasets/open-prices/prices.parquet",
+      "file_size_bytes": 26864828,
+      "columns": 48,
+      "schema": {
+        "id": "Int64",
+        "type": "String",
+        "product_code": "String",
+        "product_name": "String",
+        "category_tag": "String",
+        "labels_tags": "List(String)",
+        "origins_tags": "List(String)",
+        "price": "Decimal(precision=10, scale=3)",
+        "price_is_discounted": "Boolean",
+        "price_without_discount": "Decimal(precision=10, scale=3)",
+        "discount_type": "String",
+        "price_per": "String",
+        "currency": "String",
+        "location_osm_id": "Int64",
+        "location_osm_type": "String",
+        "location_id": "Int32",
+        "date": "Date",
+        "proof_id": "Int32",
+        "receipt_quantity": "Float32",
+        "owner": "String",
+        "source": "String",
+        "created": "Datetime(time_unit='us', time_zone='UTC')",
+        "updated": "Datetime(time_unit='us', time_zone='UTC')",
+        "proof_file_path": "String",
+        "proof_mimetype": "String",
+        "proof_type": "String",
+        "proof_date": "Date",
+        "proof_currency": "String",
+        "proof_receipt_price_count": "Int32",
+        "proof_receipt_price_total": "Decimal(precision=10, scale=3)",
+        "proof_owner": "String",
+        "proof_source": "String",
+        "proof_created": "Datetime(time_unit='us', time_zone='UTC')",
+        "proof_updated": "Datetime(time_unit='us', time_zone='UTC')",
+        "location_type": "String",
+        "location_osm_display_name": "String",
+        "location_osm_tag_key": "String",
+        "location_osm_tag_value": "String",
+        "location_osm_address_postcode": "String",
+        "location_osm_address_city": "String",
+        "location_osm_address_country": "String",
+        "location_osm_address_country_code": "String",
+        "location_osm_lat": "Float64",
+        "location_osm_lon": "Float64",
+        "location_website_url": "String",
+        "location_source": "String",
+        "location_created": "Datetime(time_unit='us', time_zone='UTC')",
+        "location_updated": "Datetime(time_unit='us', time_zone='UTC')"
+      }
+    },
+    "rows": 260509,
+    "required_fields": {
+      "identity": {
+        "id": true,
+        "product_code": true,
+        "product_name": true,
+        "category_tag": true
+      },
+      "price": {
+        "price": true,
+        "price_without_discount": true,
+        "price_is_discounted": true,
+        "price_per": true,
+        "currency": true,
+        "date": true
+      },
+      "geography": {
+        "location_osm_lat": true,
+        "location_osm_lon": true,
+        "location_osm_address_country": true,
+        "location_osm_address_country_code": true,
+        "location_osm_address_city": true,
+        "location_osm_display_name": true
+      },
+      "provenance": {
+        "proof_type": true,
+        "source": true,
+        "created": true,
+        "updated": true
+      }
+    },
+    "coverage": {
+      "id": {
+        "present_rows": 260509,
+        "coverage_pct": 100.0
+      },
+      "type": {
+        "present_rows": 260509,
+        "coverage_pct": 100.0
+      },
+      "product_code": {
+        "present_rows": 252311,
+        "coverage_pct": 96.85
+      },
+      "product_name": {
+        "present_rows": 172359,
+        "coverage_pct": 66.16
+      },
+      "category_tag": {
+        "present_rows": 8198,
+        "coverage_pct": 3.15
+      },
+      "labels_tags": {
+        "present_rows": 3030,
+        "coverage_pct": 1.16
+      },
+      "origins_tags": {
+        "present_rows": 6959,
+        "coverage_pct": 2.67
+      },
+      "price": {
+        "present_rows": 260509,
+        "coverage_pct": 100.0
+      },
+      "price_is_discounted": {
+        "present_rows": 260509,
+        "coverage_pct": 100.0
+      },
+      "price_without_discount": {
+        "present_rows": 19362,
+        "coverage_pct": 7.43
+      },
+      "price_per": {
+        "present_rows": 8198,
+        "coverage_pct": 3.15
+      },
+      "currency": {
+        "present_rows": 260338,
+        "coverage_pct": 99.93
+      },
+      "date": {
+        "present_rows": 260323,
+        "coverage_pct": 99.93
+      },
+      "location_osm_address_country": {
+        "present_rows": 259794,
+        "coverage_pct": 99.73
+      },
+      "location_osm_address_country_code": {
+        "present_rows": 259589,
+        "coverage_pct": 99.65
+      },
+      "location_osm_address_city": {
+        "present_rows": 256408,
+        "coverage_pct": 98.43
+      },
+      "location_osm_lat": {
+        "present_rows": 259794,
+        "coverage_pct": 99.73
+      },
+      "location_osm_lon": {
+        "present_rows": 259794,
+        "coverage_pct": 99.73
+      },
+      "location_osm_display_name": {
+        "present_rows": 259794,
+        "coverage_pct": 99.73
+      },
+      "proof_type": {
+        "present_rows": 260380,
+        "coverage_pct": 99.95
+      },
+      "source": {
+        "present_rows": 243705,
+        "coverage_pct": 93.55
+      }
+    },
+    "derived_quality": {
+      "positive_price": {
+        "present_rows": 260496,
+        "coverage_pct": 100.0
+      },
+      "price_currency_date_geo_ready": {
+        "present_rows": 259600,
+        "coverage_pct": 99.65
+      },
+      "barcode_price_ready": {
+        "present_rows": 251409,
+        "coverage_pct": 96.51
+      }
+    },
+    "numeric_summary": {
+      "price": {
+        "min": 0.0,
+        "median": 3.15,
+        "mean": 23.971140920275307,
+        "p95": 32.9,
+        "p99": 120.0,
+        "max": 604000.0
+      },
+      "price_without_discount": {
+        "min": 0.25,
+        "median": 5.49,
+        "mean": 587.9386989980374,
+        "p95": 40.0,
+        "p99": 199.0,
+        "max": 9999999.0
+      }
+    },
+    "date_summary": {
+      "min": "2010-07-08",
+      "max": "2026-05-28",
+      "present_rows": 260323
+    },
+    "top_currency": [
+      {
+        "value": "EUR",
+        "count": 207129
+      },
+      {
+        "value": "USD",
+        "count": 27261
+      },
+      {
+        "value": "NOK",
+        "count": 14775
+      },
+      {
+        "value": "SEK",
+        "count": 2881
+      },
+      {
+        "value": "GBP",
+        "count": 1882
+      },
+      {
+        "value": "PLN",
+        "count": 1197
+      },
+      {
+        "value": "CHF",
+        "count": 773
+      },
+      {
+        "value": "CAD",
+        "count": 648
+      },
+      {
+        "value": "JPY",
+        "count": 543
+      },
+      {
+        "value": "RUB",
+        "count": 467
+      },
+      {
+        "value": "INR",
+        "count": 346
+      },
+      {
+        "value": "MXN",
+        "count": 299
+      },
+      {
+        "value": "TWD",
+        "count": 256
+      },
+      {
+        "value": "UAH",
+        "count": 236
+      },
+      {
+        "value": "ILS",
+        "count": 225
+      },
+      {
+        "value": "KZT",
+        "count": 188
+      },
+      {
+        "value": "MAD",
+        "count": 87
+      },
+      {
+        "value": "RON",
+        "count": 82
+      },
+      {
+        "value": "CZK",
+        "count": 73
+      },
+      {
+        "value": "SGD",
+        "count": 70
+      }
+    ],
+    "top_price_per": [
+      {
+        "value": "KILOGRAM",
+        "count": 6211
+      },
+      {
+        "value": "UNIT",
+        "count": 1987
+      }
+    ],
+    "top_location_country_code": [
+      {
+        "value": "FR",
+        "count": 184473
+      },
+      {
+        "value": "US",
+        "count": 27074
+      },
+      {
+        "value": "NO",
+        "count": 14776
+      },
+      {
+        "value": "DE",
+        "count": 13500
+      },
+      {
+        "value": "SE",
+        "count": 2841
+      },
+      {
+        "value": "BE",
+        "count": 2239
+      },
+      {
+        "value": "GB",
+        "count": 1948
+      },
+      {
+        "value": "IT",
+        "count": 1385
+      },
+      {
+        "value": "PL",
+        "count": 1180
+      },
+      {
+        "value": "FI",
+        "count": 1095
+      },
+      {
+        "value": "ES",
+        "count": 936
+      },
+      {
+        "value": "AT",
+        "count": 852
+      },
+      {
+        "value": "CH",
+        "count": 782
+      },
+      {
+        "value": "CA",
+        "count": 651
+      },
+      {
+        "value": "HR",
+        "count": 646
+      },
+      {
+        "value": "JP",
+        "count": 546
+      },
+      {
+        "value": "RU",
+        "count": 469
+      },
+      {
+        "value": "IN",
+        "count": 341
+      },
+      {
+        "value": "LT",
+        "count": 308
+      },
+      {
+        "value": "MX",
+        "count": 297
+      }
+    ],
+    "top_proof_type": [
+      {
+        "value": "PRICE_TAG",
+        "count": 192574
+      },
+      {
+        "value": "RECEIPT",
+        "count": 34931
+      },
+      {
+        "value": "GDPR_REQUEST",
+        "count": 21741
+      },
+      {
+        "value": "SHOP_IMPORT",
+        "count": 11134
+      }
+    ]
+  },
+  "join": {
+    "unique_product_codes": 4503052,
+    "unique_price_product_codes": 119300,
+    "matched_unique_product_codes": 99554,
+    "price_rows_with_product_code": 252311,
+    "matched_price_rows": 225636,
+    "matched_unique_price_code_pct": 83.45,
+    "matched_price_rows_pct": 89.43
+  },
+  "task_support": {
+    "T1_global_nutrition_structure": {
+      "status": "strong",
+      "reason": "4,503,112 food rows; country/category fields are present; valid Nutri-Score A-E coverage is 30.23% and numeric Nutri-Score coverage is 30.23%. NOVA coverage is 24.91%; sugar/salt/fat coverage is 68.39%/63.24%/72.33%."
+    },
+    "T2_price_health_relationship": {
+      "status": "limited_but_feasible",
+      "reason": "260,509 price rows; 100.0% have prices, 99.93% have currency, 99.93% have dates, and 99.65% are ready for price-date-geo analysis. 89.43% of barcode price rows match the product database. Currency normalization and country coverage filtering are needed before cross-country price comparisons."
+    },
+    "T3_label_transparency": {
+      "status": "strong",
+      "reason": "Completeness coverage is 100.0%; labels coverage is 27.13%; ingredients coverage is 28.31%; quality warning/error tags are available for transparency diagnostics."
+    },
+    "T4_peer_comparison_and_anomalies": {
+      "status": "strong_for_product_anomalies_limited_for_price_anomalies",
+      "reason": "The product database supports category/brand/country peer comparison at large scale. Price-based anomalies should be scoped to countries and categories with enough matched price records."
+    }
+  }
+}
