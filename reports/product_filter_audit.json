@@ -1,0 +1,374 @@
+{
+  "generated_at": "2026-06-08T08:44:31",
+  "product_path": "datasets_raw/product-database/food.parquet",
+  "price_path": "datasets_raw/open-prices/prices.parquet",
+  "total_rows": 4503112,
+  "filters": [
+    {
+      "name": "base_identity_geo_category",
+      "count": 1789127,
+      "pct": 39.73,
+      "price_matched_count": 83760,
+      "price_matched_pct_total": 1.86,
+      "price_matched_pct_filter": 4.68,
+      "description": "code/name/country/category are present; suitable for maps and category counts."
+    },
+    {
+      "name": "base_with_any_nutriments",
+      "count": 1631800,
+      "pct": 36.24,
+      "price_matched_count": 80993,
+      "price_matched_pct_total": 1.8,
+      "price_matched_pct_filter": 4.96,
+      "description": "Base fields plus any nutriments list; suitable for coverage diagnostics."
+    },
+    {
+      "name": "core_nutrition_ready",
+      "count": 1414024,
+      "pct": 31.4,
+      "price_matched_count": 74476,
+      "price_matched_pct_total": 1.65,
+      "price_matched_pct_filter": 5.27,
+      "description": "Base fields plus energy, fat, sugars, salt/sodium and proteins."
+    },
+    {
+      "name": "broad_health_ready",
+      "count": 1389664,
+      "pct": 30.86,
+      "price_matched_count": 73850,
+      "price_matched_pct_total": 1.64,
+      "price_matched_pct_filter": 5.31,
+      "description": "Core nutrition plus either Nutri-Score or NOVA; good for wider health comparisons."
+    },
+    {
+      "name": "full_health_ready",
+      "count": 819677,
+      "pct": 18.2,
+      "price_matched_count": 59948,
+      "price_matched_pct_total": 1.33,
+      "price_matched_pct_filter": 7.31,
+      "description": "Core nutrition plus both valid Nutri-Score and NOVA."
+    },
+    {
+      "name": "brand_full_health_ready",
+      "count": 702128,
+      "pct": 15.59,
+      "price_matched_count": 59081,
+      "price_matched_pct_total": 1.31,
+      "price_matched_pct_filter": 8.41,
+      "description": "Full health fields plus brand; suitable for brand/category comparisons."
+    },
+    {
+      "name": "strict_quality_ready",
+      "count": 688334,
+      "pct": 15.29,
+      "price_matched_count": 58892,
+      "price_matched_pct_total": 1.31,
+      "price_matched_pct_filter": 8.56,
+      "description": "Brand health-ready products with quality fields and completeness >= 0.5."
+    },
+    {
+      "name": "full_nutrient_detail_ready",
+      "count": 671100,
+      "pct": 14.9,
+      "price_matched_count": 58211,
+      "price_matched_pct_total": 1.29,
+      "price_matched_pct_filter": 8.67,
+      "description": "Strict set plus saturated fat and carbohydrates; suitable for detailed product views."
+    }
+  ],
+  "strict_quality_summary": {
+    "rows": 688334,
+    "unique_codes": 688324,
+    "nutriscore_score_median": 11.0,
+    "nova_group_median": 4.0,
+    "completeness_median": 0.6875,
+    "completeness_mean": 0.7206666469573975
+  },
+  "strict_top_countries": [
+    {
+      "value": "en:france",
+      "count": 244578
+    },
+    {
+      "value": "en:united-states",
+      "count": 194676
+    },
+    {
+      "value": "en:germany",
+      "count": 83338
+    },
+    {
+      "value": "en:spain",
+      "count": 36299
+    },
+    {
+      "value": "en:united-kingdom",
+      "count": 34248
+    },
+    {
+      "value": "en:italy",
+      "count": 26757
+    },
+    {
+      "value": "en:switzerland",
+      "count": 22203
+    },
+    {
+      "value": "en:belgium",
+      "count": 21505
+    },
+    {
+      "value": "en:world",
+      "count": 19906
+    },
+    {
+      "value": "en:netherlands",
+      "count": 14277
+    },
+    {
+      "value": "en:canada",
+      "count": 10710
+    },
+    {
+      "value": "en:poland",
+      "count": 8714
+    },
+    {
+      "value": "en:australia",
+      "count": 6337
+    },
+    {
+      "value": "en:portugal",
+      "count": 6300
+    },
+    {
+      "value": "en:austria",
+      "count": 6211
+    },
+    {
+      "value": "en:mexico",
+      "count": 5214
+    },
+    {
+      "value": "en:ireland",
+      "count": 5164
+    },
+    {
+      "value": "en:sweden",
+      "count": 5051
+    },
+    {
+      "value": "en:bulgaria",
+      "count": 5023
+    },
+    {
+      "value": "en:czech-republic",
+      "count": 4369
+    }
+  ],
+  "strict_top_categories": [
+    {
+      "value": "en:plant-based-foods-and-beverages",
+      "count": 213796
+    },
+    {
+      "value": "en:plant-based-foods",
+      "count": 186502
+    },
+    {
+      "value": "en:snacks",
+      "count": 153272
+    },
+    {
+      "value": "en:sweet-snacks",
+      "count": 108169
+    },
+    {
+      "value": "en:cereals-and-potatoes",
+      "count": 75360
+    },
+    {
+      "value": "en:dairies",
+      "count": 71098
+    },
+    {
+      "value": "en:beverages",
+      "count": 62064
+    },
+    {
+      "value": "en:fermented-foods",
+      "count": 54339
+    },
+    {
+      "value": "en:desserts",
+      "count": 52678
+    },
+    {
+      "value": "en:fermented-milk-products",
+      "count": 52277
+    },
+    {
+      "value": "en:meats-and-their-products",
+      "count": 51208
+    },
+    {
+      "value": "en:meals",
+      "count": 50445
+    },
+    {
+      "value": "en:fruits-and-vegetables-based-foods",
+      "count": 49115
+    },
+    {
+      "value": "en:biscuits-and-cakes",
+      "count": 48942
+    },
+    {
+      "value": "en:cereals-and-their-products",
+      "count": 47696
+    },
+    {
+      "value": "en:condiments",
+      "count": 42995
+    },
+    {
+      "value": "en:frozen-foods",
+      "count": 41365
+    },
+    {
+      "value": "en:confectioneries",
+      "count": 36984
+    },
+    {
+      "value": "en:sauces",
+      "count": 36892
+    },
+    {
+      "value": "en:spreads",
+      "count": 36446
+    }
+  ],
+  "strict_top_brands": [
+    {
+      "value": "xx:carrefour",
+      "count": 11752
+    },
+    {
+      "value": "xx:u",
+      "count": 9029
+    },
+    {
+      "value": "xx:auchan",
+      "count": 6259
+    },
+    {
+      "value": "xx:lidl",
+      "count": 5478
+    },
+    {
+      "value": "xx:marque-repere",
+      "count": 4693
+    },
+    {
+      "value": "xx:aldi",
+      "count": 4661
+    },
+    {
+      "value": "xx:nestle",
+      "count": 4375
+    },
+    {
+      "value": "xx:casino",
+      "count": 4266
+    },
+    {
+      "value": "xx:coop",
+      "count": 3986
+    },
+    {
+      "value": "xx:hacendado",
+      "count": 3226
+    },
+    {
+      "value": "xx:leader-price",
+      "count": 2927
+    },
+    {
+      "value": "xx:tesco",
+      "count": 2735
+    },
+    {
+      "value": "xx:migros",
+      "count": 2703
+    },
+    {
+      "value": "xx:picard",
+      "count": 2516
+    },
+    {
+      "value": "xx:monoprix",
+      "count": 2329
+    },
+    {
+      "value": "xx:albert-heijn",
+      "count": 2150
+    },
+    {
+      "value": "xx:delhaize",
+      "count": 2099
+    },
+    {
+      "value": "xx:rewe",
+      "count": 2092
+    },
+    {
+      "value": "xx:danone",
+      "count": 2075
+    },
+    {
+      "value": "xx:sainsbury-s",
+      "count": 2069
+    }
+  ],
+  "strict_nutriscore_dist": [
+    {
+      "nutriscore_grade": "a",
+      "len": 105130
+    },
+    {
+      "nutriscore_grade": "b",
+      "len": 70412
+    },
+    {
+      "nutriscore_grade": "c",
+      "len": 150517
+    },
+    {
+      "nutriscore_grade": "d",
+      "len": 168340
+    },
+    {
+      "nutriscore_grade": "e",
+      "len": 193935
+    }
+  ],
+  "strict_nova_dist": [
+    {
+      "nova_group": 1,
+      "len": 88899
+    },
+    {
+      "nova_group": 2,
+      "len": 17260
+    },
+    {
+      "nova_group": 3,
+      "len": 155642
+    },
+    {
+      "nova_group": 4,
+      "len": 426533
+    }
+  ]
+}

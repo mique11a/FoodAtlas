@@ -1,0 +1,865 @@
+{
+  "generated_at": "2026-06-08T09:07:24",
+  "aligned_price_rows": 113153,
+  "unique_products_with_price": 39917,
+  "products_with_price_pct": 9.97,
+  "same_market_rows": 96570,
+  "same_market_rows_pct": 85.34,
+  "same_market_non_null_currency_rows": 96499,
+  "same_market_non_null_currency_rows_pct": 85.28,
+  "unique_products_with_same_market_price": 34852,
+  "unique_products_with_same_market_price_pct": 8.7,
+  "aligned_currencies": [
+    {
+      "currency": "EUR",
+      "len": 101828
+    },
+    {
+      "currency": "USD",
+      "len": 7426
+    },
+    {
+      "currency": "NOK",
+      "len": 1201
+    },
+    {
+      "currency": "GBP",
+      "len": 1004
+    },
+    {
+      "currency": "CHF",
+      "len": 392
+    },
+    {
+      "currency": "CAD",
+      "len": 288
+    },
+    {
+      "currency": "SEK",
+      "len": 264
+    },
+    {
+      "currency": "PLN",
+      "len": 147
+    },
+    {
+      "currency": "TWD",
+      "len": 93
+    },
+    {
+      "currency": null,
+      "len": 88
+    },
+    {
+      "currency": "MXN",
+      "len": 67
+    },
+    {
+      "currency": "ILS",
+      "len": 36
+    },
+    {
+      "currency": "RUB",
+      "len": 35
+    },
+    {
+      "currency": "ADP",
+      "len": 30
+    },
+    {
+      "currency": "UAH",
+      "len": 27
+    },
+    {
+      "currency": "MAD",
+      "len": 22
+    },
+    {
+      "currency": "RON",
+      "len": 20
+    },
+    {
+      "currency": "XPF",
+      "len": 17
+    },
+    {
+      "currency": "PAB",
+      "len": 14
+    },
+    {
+      "currency": "CZK",
+      "len": 12
+    },
+    {
+      "currency": "MYR",
+      "len": 12
+    },
+    {
+      "currency": "INR",
+      "len": 11
+    },
+    {
+      "currency": "ALL",
+      "len": 10
+    },
+    {
+      "currency": "JPY",
+      "len": 9
+    },
+    {
+      "currency": "HUF",
+      "len": 9
+    },
+    {
+      "currency": "THB",
+      "len": 8
+    },
+    {
+      "currency": "DKK",
+      "len": 7
+    },
+    {
+      "currency": "TND",
+      "len": 7
+    },
+    {
+      "currency": "ARS",
+      "len": 6
+    },
+    {
+      "currency": "BGN",
+      "len": 6
+    },
+    {
+      "currency": "AUD",
+      "len": 6
+    },
+    {
+      "currency": "KZT",
+      "len": 6
+    },
+    {
+      "currency": "SGD",
+      "len": 5
+    },
+    {
+      "currency": "RSD",
+      "len": 4
+    },
+    {
+      "currency": "PHP",
+      "len": 4
+    },
+    {
+      "currency": "TRY",
+      "len": 3
+    },
+    {
+      "currency": "LAK",
+      "len": 3
+    },
+    {
+      "currency": "AED",
+      "len": 2
+    },
+    {
+      "currency": "ISK",
+      "len": 2
+    },
+    {
+      "currency": "KRW",
+      "len": 2
+    },
+    {
+      "currency": "BMD",
+      "len": 2
+    },
+    {
+      "currency": "DZD",
+      "len": 2
+    },
+    {
+      "currency": "XOF",
+      "len": 2
+    },
+    {
+      "currency": "MRU",
+      "len": 2
+    },
+    {
+      "currency": "BAM",
+      "len": 2
+    },
+    {
+      "currency": "AFN",
+      "len": 1
+    },
+    {
+      "currency": "DOP",
+      "len": 1
+    },
+    {
+      "currency": "CLP",
+      "len": 1
+    },
+    {
+      "currency": "BSD",
+      "len": 1
+    },
+    {
+      "currency": "QAR",
+      "len": 1
+    },
+    {
+      "currency": "HKD",
+      "len": 1
+    },
+    {
+      "currency": "LYD",
+      "len": 1
+    },
+    {
+      "currency": "TZS",
+      "len": 1
+    },
+    {
+      "currency": "LBP",
+      "len": 1
+    },
+    {
+      "currency": "XAF",
+      "len": 1
+    }
+  ],
+  "aligned_price_countries": [
+    {
+      "location_osm_address_country_code": "FR",
+      "len": 92334
+    },
+    {
+      "location_osm_address_country_code": "US",
+      "len": 7340
+    },
+    {
+      "location_osm_address_country_code": "DE",
+      "len": 6511
+    },
+    {
+      "location_osm_address_country_code": "NO",
+      "len": 1201
+    },
+    {
+      "location_osm_address_country_code": "GB",
+      "len": 1047
+    },
+    {
+      "location_osm_address_country_code": "BE",
+      "len": 639
+    },
+    {
+      "location_osm_address_country_code": "IT",
+      "len": 611
+    },
+    {
+      "location_osm_address_country_code": null,
+      "len": 442
+    },
+    {
+      "location_osm_address_country_code": "CH",
+      "len": 396
+    },
+    {
+      "location_osm_address_country_code": "ES",
+      "len": 376
+    },
+    {
+      "location_osm_address_country_code": "AT",
+      "len": 370
+    },
+    {
+      "location_osm_address_country_code": "CA",
+      "len": 289
+    },
+    {
+      "location_osm_address_country_code": "SE",
+      "len": 262
+    },
+    {
+      "location_osm_address_country_code": "MC",
+      "len": 190
+    },
+    {
+      "location_osm_address_country_code": "PL",
+      "len": 146
+    },
+    {
+      "location_osm_address_country_code": "HR",
+      "len": 132
+    },
+    {
+      "location_osm_address_country_code": "NL",
+      "len": 95
+    },
+    {
+      "location_osm_address_country_code": "TW",
+      "len": 93
+    },
+    {
+      "location_osm_address_country_code": "PT",
+      "len": 76
+    },
+    {
+      "location_osm_address_country_code": "FI",
+      "len": 72
+    },
+    {
+      "location_osm_address_country_code": "MX",
+      "len": 67
+    },
+    {
+      "location_osm_address_country_code": "LT",
+      "len": 52
+    },
+    {
+      "location_osm_address_country_code": "EE",
+      "len": 49
+    },
+    {
+      "location_osm_address_country_code": "IL",
+      "len": 36
+    },
+    {
+      "location_osm_address_country_code": "RU",
+      "len": 36
+    },
+    {
+      "location_osm_address_country_code": "UA",
+      "len": 27
+    },
+    {
+      "location_osm_address_country_code": "MA",
+      "len": 21
+    },
+    {
+      "location_osm_address_country_code": "RO",
+      "len": 20
+    },
+    {
+      "location_osm_address_country_code": "GR",
+      "len": 17
+    },
+    {
+      "location_osm_address_country_code": "PA",
+      "len": 15
+    },
+    {
+      "location_osm_address_country_code": "IN",
+      "len": 12
+    },
+    {
+      "location_osm_address_country_code": "IE",
+      "len": 12
+    },
+    {
+      "location_osm_address_country_code": "CZ",
+      "len": 12
+    },
+    {
+      "location_osm_address_country_code": "MY",
+      "len": 12
+    },
+    {
+      "location_osm_address_country_code": "AL",
+      "len": 11
+    },
+    {
+      "location_osm_address_country_code": "JP",
+      "len": 10
+    },
+    {
+      "location_osm_address_country_code": "BG",
+      "len": 9
+    },
+    {
+      "location_osm_address_country_code": "HU",
+      "len": 9
+    },
+    {
+      "location_osm_address_country_code": "TH",
+      "len": 8
+    },
+    {
+      "location_osm_address_country_code": "DK",
+      "len": 8
+    },
+    {
+      "location_osm_address_country_code": "LU",
+      "len": 8
+    },
+    {
+      "location_osm_address_country_code": "AU",
+      "len": 7
+    },
+    {
+      "location_osm_address_country_code": "TN",
+      "len": 7
+    },
+    {
+      "location_osm_address_country_code": "KZ",
+      "len": 6
+    },
+    {
+      "location_osm_address_country_code": "SG",
+      "len": 5
+    },
+    {
+      "location_osm_address_country_code": "AR",
+      "len": 5
+    },
+    {
+      "location_osm_address_country_code": "RS",
+      "len": 5
+    },
+    {
+      "location_osm_address_country_code": "PH",
+      "len": 4
+    },
+    {
+      "location_osm_address_country_code": "KR",
+      "len": 3
+    },
+    {
+      "location_osm_address_country_code": "LA",
+      "len": 3
+    },
+    {
+      "location_osm_address_country_code": "BA",
+      "len": 3
+    },
+    {
+      "location_osm_address_country_code": "TR",
+      "len": 3
+    },
+    {
+      "location_osm_address_country_code": "SK",
+      "len": 3
+    },
+    {
+      "location_osm_address_country_code": "SN",
+      "len": 2
+    },
+    {
+      "location_osm_address_country_code": "AE",
+      "len": 2
+    },
+    {
+      "location_osm_address_country_code": "BM",
+      "len": 2
+    },
+    {
+      "location_osm_address_country_code": "IS",
+      "len": 2
+    },
+    {
+      "location_osm_address_country_code": "MR",
+      "len": 2
+    },
+    {
+      "location_osm_address_country_code": "BS",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "KH",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "DZ",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "CG",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "EG",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "QA",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "SA",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "JE",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "MM",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "LB",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "CN",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "CL",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "TZ",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "LV",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "LY",
+      "len": 1
+    },
+    {
+      "location_osm_address_country_code": "PY",
+      "len": 1
+    }
+  ],
+  "price_summary_rows": 41208,
+  "median_price_by_currency": [
+    {
+      "currency": "EUR",
+      "rows": 101828,
+      "median_price": 2.39,
+      "mean_price": 2.8249048689947753
+    },
+    {
+      "currency": "USD",
+      "rows": 7426,
+      "median_price": 4.99,
+      "mean_price": 5.863006329113924
+    },
+    {
+      "currency": "NOK",
+      "rows": 1201,
+      "median_price": 33.7,
+      "mean_price": 41.79407160699417
+    },
+    {
+      "currency": "GBP",
+      "rows": 1004,
+      "median_price": 1.8,
+      "mean_price": 2.2979880478087646
+    },
+    {
+      "currency": "CHF",
+      "rows": 392,
+      "median_price": 2.8,
+      "mean_price": 3.4587755102040814
+    },
+    {
+      "currency": "CAD",
+      "rows": 288,
+      "median_price": 3.5,
+      "mean_price": 4.638993055555556
+    },
+    {
+      "currency": "SEK",
+      "rows": 264,
+      "median_price": 27.35,
+      "mean_price": 27.70977272727273
+    },
+    {
+      "currency": "PLN",
+      "rows": 147,
+      "median_price": 7.45,
+      "mean_price": 9.438639455782313
+    },
+    {
+      "currency": "TWD",
+      "rows": 93,
+      "median_price": 139.0,
+      "mean_price": 150.06451612903226
+    },
+    {
+      "currency": null,
+      "rows": 88,
+      "median_price": 1.585,
+      "mean_price": 2.8260227272727274
+    },
+    {
+      "currency": "MXN",
+      "rows": 67,
+      "median_price": 42.0,
+      "mean_price": 45.80671641791045
+    },
+    {
+      "currency": "ILS",
+      "rows": 36,
+      "median_price": 11.0,
+      "mean_price": 12.415277777777778
+    },
+    {
+      "currency": "RUB",
+      "rows": 35,
+      "median_price": 452.0,
+      "mean_price": 552.5965714285715
+    },
+    {
+      "currency": "ADP",
+      "rows": 30,
+      "median_price": 2.47,
+      "mean_price": 4.962666666666666
+    },
+    {
+      "currency": "UAH",
+      "rows": 27,
+      "median_price": 124.0,
+      "mean_price": 136.70074074074074
+    },
+    {
+      "currency": "MAD",
+      "rows": 22,
+      "median_price": 8.4,
+      "mean_price": 11.977272727272727
+    },
+    {
+      "currency": "RON",
+      "rows": 20,
+      "median_price": 5.99,
+      "mean_price": 8.0425
+    },
+    {
+      "currency": "XPF",
+      "rows": 17,
+      "median_price": 355.0,
+      "mean_price": 353.1764705882353
+    },
+    {
+      "currency": "PAB",
+      "rows": 14,
+      "median_price": 5.265000000000001,
+      "mean_price": 4.776428571428572
+    },
+    {
+      "currency": "MYR",
+      "rows": 12,
+      "median_price": 8.145,
+      "mean_price": 11.324166666666665
+    },
+    {
+      "currency": "CZK",
+      "rows": 12,
+      "median_price": 35.4,
+      "mean_price": 41.166666666666664
+    },
+    {
+      "currency": "INR",
+      "rows": 11,
+      "median_price": 100.0,
+      "mean_price": 139.0909090909091
+    },
+    {
+      "currency": "ALL",
+      "rows": 10,
+      "median_price": 164.0,
+      "mean_price": 197.7
+    },
+    {
+      "currency": "HUF",
+      "rows": 9,
+      "median_price": 899.0,
+      "mean_price": 1605.6666666666667
+    },
+    {
+      "currency": "JPY",
+      "rows": 9,
+      "median_price": 517.0,
+      "mean_price": 632.7688888888889
+    },
+    {
+      "currency": "THB",
+      "rows": 8,
+      "median_price": 235.0,
+      "mean_price": 228.5
+    },
+    {
+      "currency": "TND",
+      "rows": 7,
+      "median_price": 5.29,
+      "mean_price": 8.797142857142857
+    },
+    {
+      "currency": "DKK",
+      "rows": 7,
+      "median_price": 20.0,
+      "mean_price": 21.05
+    },
+    {
+      "currency": "KZT",
+      "rows": 6,
+      "median_price": 819.0,
+      "mean_price": 876.1666666666666
+    },
+    {
+      "currency": "ARS",
+      "rows": 6,
+      "median_price": 2973.5,
+      "mean_price": 2923.1666666666665
+    },
+    {
+      "currency": "AUD",
+      "rows": 6,
+      "median_price": 3.0,
+      "mean_price": 3.0500000000000003
+    },
+    {
+      "currency": "BGN",
+      "rows": 6,
+      "median_price": 1.795,
+      "mean_price": 2.6933333333333334
+    },
+    {
+      "currency": "SGD",
+      "rows": 5,
+      "median_price": 6.1,
+      "mean_price": 5.0
+    },
+    {
+      "currency": "RSD",
+      "rows": 4,
+      "median_price": 349.985,
+      "mean_price": 311.99
+    },
+    {
+      "currency": "PHP",
+      "rows": 4,
+      "median_price": 66.25,
+      "mean_price": 95.375
+    },
+    {
+      "currency": "TRY",
+      "rows": 3,
+      "median_price": 15.75,
+      "mean_price": 60.166666666666664
+    },
+    {
+      "currency": "LAK",
+      "rows": 3,
+      "median_price": 69000.0,
+      "mean_price": 65333.333333333336
+    },
+    {
+      "currency": "DZD",
+      "rows": 2,
+      "median_price": 750.0,
+      "mean_price": 750.0
+    },
+    {
+      "currency": "BMD",
+      "rows": 2,
+      "median_price": 9.120000000000001,
+      "mean_price": 9.120000000000001
+    },
+    {
+      "currency": "XOF",
+      "rows": 2,
+      "median_price": 1925.0,
+      "mean_price": 1925.0
+    },
+    {
+      "currency": "ISK",
+      "rows": 2,
+      "median_price": 534.0,
+      "mean_price": 534.0
+    },
+    {
+      "currency": "KRW",
+      "rows": 2,
+      "median_price": 3940.0,
+      "mean_price": 3940.0
+    },
+    {
+      "currency": "MRU",
+      "rows": 2,
+      "median_price": 50.0,
+      "mean_price": 50.0
+    },
+    {
+      "currency": "AED",
+      "rows": 2,
+      "median_price": 16.29,
+      "mean_price": 16.29
+    },
+    {
+      "currency": "BAM",
+      "rows": 2,
+      "median_price": 0.8200000000000001,
+      "mean_price": 0.8200000000000001
+    },
+    {
+      "currency": "LBP",
+      "rows": 1,
+      "median_price": 88853.0,
+      "mean_price": 88853.0
+    },
+    {
+      "currency": "CLP",
+      "rows": 1,
+      "median_price": 4.0,
+      "mean_price": 4.0
+    },
+    {
+      "currency": "QAR",
+      "rows": 1,
+      "median_price": 11.0,
+      "mean_price": 11.0
+    },
+    {
+      "currency": "LYD",
+      "rows": 1,
+      "median_price": 15.0,
+      "mean_price": 15.0
+    },
+    {
+      "currency": "HKD",
+      "rows": 1,
+      "median_price": 23.9,
+      "mean_price": 23.9
+    },
+    {
+      "currency": "BSD",
+      "rows": 1,
+      "median_price": 1.81,
+      "mean_price": 1.81
+    },
+    {
+      "currency": "AFN",
+      "rows": 1,
+      "median_price": 1.95,
+      "mean_price": 1.95
+    },
+    {
+      "currency": "DOP",
+      "rows": 1,
+      "median_price": 154.0,
+      "mean_price": 154.0
+    },
+    {
+      "currency": "TZS",
+      "rows": 1,
+      "median_price": 7000.0,
+      "mean_price": 7000.0
+    },
+    {
+      "currency": "XAF",
+      "rows": 1,
+      "median_price": 750.0,
+      "mean_price": 750.0
+    }
+  ]
+}
