@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodAtlas - 全球食品营养结构可视分析</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #fdf6f0; color: #4a3728; }
+  .header { background: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #f0a060; box-shadow: 0 2px 8px rgba(200,120,50,0.08); }
+  .header h1 { font-size: 20px; color: #d36a2c; }
+  .toolbar { display: flex; gap: 12px; align-items: center; }
+  .toolbar label { font-size: 13px; color: #8b5e3c; }
+  .toolbar select, .toolbar button { padding: 6px 14px; border: 1px solid #e0c8a8; border-radius: 6px; background: #fff; color: #4a3728; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .toolbar select:hover, .toolbar button:hover { border-color: #f0a060; background: #fff8f2; }
+  .toolbar button { background: #f0a060; color: #fff; border-color: #f0a060; font-weight: bold; }
+  .toolbar button:hover { background: #e08e4a; }
+  .dashboard { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 220px 150px 1fr; gap: 12px; padding: 12px; height: calc(100vh - 56px); }
+  .panel { background: #fff; border-radius: 8px; border: 1px solid #ead5c0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(150,100,50,0.06); }
+  .panel-title { padding: 10px 16px; font-size: 13px; font-weight: bold; color: #c05e1a; background: linear-gradient(180deg, #fff9f3, #fff3e6); border-bottom: 1px solid #ead5c0; flex-shrink: 0; }
+  .panel-body { flex: 1; min-height: 0; }
+  .panel-map { grid-column: 1; grid-row: 1 / 3; }
+  .panel-structure { grid-column: 2; grid-row: 1 / 3; }
+  .panel-anomaly { grid-column: 1; grid-row: 3; }
+  .panel-price { grid-column: 2; grid-row: 3; }
+  .panel-detail { grid-column: 1 / 3; grid-row: 3; background: #fffbf7; z-index: 10; pointer-events: none; clip-path: circle(0% at var(--detail-x, 50%) var(--detail-y, 50%)); opacity: 0; transition: clip-path 0.35s ease-out, opacity 0.25s ease-out; }
+  .panel-detail.show { pointer-events: auto; clip-path: circle(80% at var(--detail-x, 50%) var(--detail-y, 50%)); opacity: 1; }
+  .detail-content { padding: 12px 16px; display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; overflow-y: auto; }
+  .detail-card { background: #fff; border-radius: 6px; padding: 12px 16px; min-width: 210px; border: 1px solid #ead5c0; box-shadow: 0 1px 4px rgba(150,100,50,0.04); }
+  .detail-card h4 { color: #c05e1a; margin-bottom: 8px; font-size: 13px; border-bottom: 1px dotted #ead5c0; padding-bottom: 4px; }
+  .detail-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .detail-label { color: #a0846a; }
+  .detail-value { color: #4a3728; font-weight: bold; }
+  .flag-tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin: 2px; }
+  .flag-warn { background: #ffe0b2; color: #e65100; }
+  .flag-bad { background: #ffcdd2; color: #b71c1c; }
+  .flag-good { background: #c8e6c9; color: #1b5e20; }
+  .note { color: #b8a088; font-size: 11px; padding: 10px 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍽️ FoodAtlas — 开放食品营养结构可视分析</h1>
+  <div class="toolbar">
+    <label style="align-self:center;font-size:13px;">国家</label>
+    <select id="countrySelect"><option value="">全部国家</option></select>
+    <label style="align-self:center;font-size:13px;">品类</label>
+    <select id="categorySelect"><option value="">全部品类</option></select>
+    <label style="align-self:center;font-size:13px;">指标</label>
+    <select id="metricSelect">
+      <option value="health_score">健康评分</option>
+      <option value="sugars">糖含量</option>
+      <option value="salt">盐含量</option>
+      <option value="fat">脂肪</option>
+      <option value="energy">能量</option>
+      <option value="nutriscore">Nutri-Score</option>
+      <option value="nova">NOVA 加工程度</option>
+    </select>
+    <button id="resetBtn">重置</button>
+  </div>
+</div>
+
+<div class="dashboard">
+  <!-- ① 全球概览地图 -->
+  <div class="panel panel-map">
+    <div class="panel-title">① 全球食品样本概览 <button id="backToWorld" onclick="resetMapView()" style="display:none;float:right;background:none;border:1px solid #dcc8b0;border-radius:4px;padding:2px 10px;cursor:pointer;color:#8b5e3c;font-size:12px;">← 返回世界</button></div>
+    <div class="panel-body" id="chartMap"></div>
+  </div>
+
+  <!-- ② 营养结构视图 -->
+  <div class="panel panel-structure">
+    <div class="panel-title">② 品类营养结构</div>
+    <div class="panel-body" id="chartSunburst"></div>
+  </div>
+
+  <!-- ③ 产品异常散点图 -->
+  <div class="panel panel-anomaly">
+    <div class="panel-title">③ 产品异常检测散点图
+      <span style="margin-left:12px;font-weight:normal;">
+        X <select id="anomalyX" style="font-size:11px;padding:2px 6px;border:1px solid #dcc8b0;border-radius:4px;background:#fff;color:#4a3728;">
+          <option value="sugars">糖含量</option><option value="salt">盐含量</option><option value="fat">脂肪</option>
+          <option value="health">健康评分</option><option value="nutriscore_num">Nutri-Score</option><option value="nova">NOVA等级</option>
+          <option value="energy">能量</option><option value="completeness">数据完整度</option>
+        </select>
+        Y <select id="anomalyY" style="font-size:11px;padding:2px 6px;border:1px solid #dcc8b0;border-radius:4px;background:#fff;color:#4a3728;">
+          <option value="price" selected>价格</option><option value="nova">NOVA等级</option>
+          <option value="sugars">糖含量</option><option value="salt">盐含量</option><option value="fat">脂肪</option>
+          <option value="health">健康评分</option>
+          <option value="nutriscore_num">Nutri-Score</option><option value="energy">能量</option>
+          <option value="completeness">数据完整度</option><option value="anomaly">异常度</option>
+        </select>
+      </span>
+    </div>
+    <div class="panel-body" id="chartAnomaly"></div>
+  </div>
+
+  <!-- ④ 价格-营养关系 -->
+  <div class="panel panel-price">
+    <div class="panel-title">④ 价格-营养关系</div>
+    <div class="panel-body" id="chartPrice"></div>
+  </div>
+
+  <!-- ⑤ 产品详情（默认隐藏，点击产品后出现） -->
+  <div class="panel panel-detail">
+    <div class="panel-title">⑤ 产品详情</div>
+    <div class="detail-content" id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+// ========== Mock 数据 ==========
+const COUNTRIES = [
+  { name: 'France', enName: 'France', samples: 160329, health: 0.62, sugars: 22.3, salt: 0.81, fat: 12.5 },
+  { name: 'United States', enName: 'United States', samples: 102375, health: 0.45, sugars: 28.1, salt: 1.02, fat: 15.8 },
+  { name: 'Germany', enName: 'Germany', samples: 49152, health: 0.58, sugars: 19.7, salt: 0.88, fat: 13.2 },
+  { name: 'Spain', enName: 'Spain', samples: 19606, health: 0.65, sugars: 18.5, salt: 0.76, fat: 14.1 },
+  { name: 'United Kingdom', enName: 'United Kingdom', samples: 17782, health: 0.52, sugars: 24.8, salt: 0.92, fat: 13.9 },
+  { name: 'Italy', enName: 'Italy', samples: 14278, health: 0.68, sugars: 16.2, salt: 0.72, fat: 11.8 },
+  { name: 'Belgium', enName: 'Belgium', samples: 14855, health: 0.56, sugars: 21.5, salt: 0.85, fat: 13.4 },
+  { name: 'Netherlands', enName: 'Netherlands', samples: 7172, health: 0.54, sugars: 23.1, salt: 0.90, fat: 14.2 },
+  { name: 'Switzerland', enName: 'Switzerland', samples: 6996, health: 0.63, sugars: 17.9, salt: 0.74, fat: 12.0 },
+  { name: 'Canada', enName: 'Canada', samples: 7994, health: 0.51, sugars: 25.4, salt: 0.95, fat: 14.7 },
+];
+
+const CATEGORIES = [
+  { name: '甜食', enName: 'Sweet snacks', parent: '零食', samples: 95739, health: 0.35, sugars: 38.2, salt: 0.42, fat: 18.5, energy: 430, nutriscore: 2.3, nova: 3.5 },
+  { name: '植物基食品', enName: 'Plant-based foods', parent: '', samples: 88463, health: 0.72, sugars: 8.5, salt: 0.65, fat: 9.2, energy: 280, nutriscore: 3.8, nova: 2.1 },
+  { name: '谷物与土豆', enName: 'Cereals & potatoes', parent: '', samples: 64422, health: 0.55, sugars: 12.3, salt: 0.78, fat: 11.0, energy: 320, nutriscore: 3.2, nova: 2.8 },
+  { name: '甜点', enName: 'Desserts', parent: '', samples: 42494, health: 0.30, sugars: 35.8, salt: 0.52, fat: 20.1, energy: 410, nutriscore: 2.1, nova: 3.7 },
+  { name: '饮料', enName: 'Beverages', parent: '', samples: 36704, health: 0.42, sugars: 22.5, salt: 0.08, fat: 1.5, energy: 180, nutriscore: 2.8, nova: 3.2 },
+  { name: '零食', enName: 'Snacks', parent: '', samples: 33134, health: 0.38, sugars: 28.4, salt: 1.35, fat: 25.2, energy: 480, nutriscore: 2.5, nova: 3.4 },
+  { name: '发酵乳制品', enName: 'Fermented milk', parent: '乳制品', samples: 26770, health: 0.66, sugars: 14.2, salt: 0.28, fat: 7.8, energy: 220, nutriscore: 3.6, nova: 1.8 },
+  { name: '乳制品', enName: 'Dairies', parent: '', samples: 11077, health: 0.60, sugars: 10.5, salt: 0.55, fat: 15.3, energy: 310, nutriscore: 3.0, nova: 2.5 },
+];
+
+// 生成几个 mock 异常产品
+const MOCK_PRODUCTS = [];
+const anomalyProducts = [
+  { name: 'Chocoblast Ultra', country: 'France', category: '甜食', sugars: 58, salt: 1.2, fat: 32, health: 0.18, price: 3.5, anomaly: 4.2, flags: ['high_sugar'] },
+  { name: 'SaltBomb Crackers', country: 'United States', category: '零食', sugars: 5, salt: 3.8, fat: 22, health: 0.28, price: 2.1, anomaly: 3.9, flags: ['high_salt'] },
+  { name: 'GreenWash Juice', country: 'Germany', category: '饮料', sugars: 42, salt: 0.1, fat: 0, health: 0.22, price: 4.8, anomaly: 3.5, flags: ['high_price_low_health'] },
+  { name: 'CheeseDeluxe', country: 'Italy', category: '乳制品', sugars: 3, salt: 2.1, fat: 35, health: 0.48, price: 6.2, anomaly: 3.0, flags: ['high_fat'] },
+  { name: 'FiberPlus Bar', country: 'Spain', category: '谷物与土豆', sugars: 12, salt: 0.4, fat: 8, health: 0.75, price: 2.9, anomaly: 1.2, flags: [] },
+];
+for (let i = 0; i < 30; i++) {
+  const base = anomalyProducts[i % 5];
+  MOCK_PRODUCTS.push({
+    id: i, name: base.name + (i < 5 ? '' : ' ' + i),
+    country: COUNTRIES[i % 10].enName,
+    category: CATEGORIES[i % 8].enName,
+    sugars: base.sugars + (Math.random() - 0.5) * 20,
+    salt: base.salt + (Math.random() - 0.5) * 1.5,
+    fat: base.fat + (Math.random() - 0.5) * 15,
+    health: Math.max(0.1, Math.min(1, base.health + (Math.random() - 0.5) * 0.3)),
+    price: base.price + (Math.random() - 0.5) * 4,
+    anomaly: Math.max(0.5, base.anomaly + (Math.random() - 0.5) * 2),
+    flags: i < 5 ? base.flags : [],
+    nutriscore: ['A','B','C','D','E'][Math.floor(Math.random() * 5)],
+    nova: Math.floor(Math.random() * 4) + 1,
+    completeness: Math.random() * 0.5 + 0.5,
+    energy: Math.round(Math.max(10, 400 * Math.random() + 100)),
+    nutriscore_num: ({A:5,B:4,C:3,D:2,E:1})[['A','B','C','D','E'][Math.floor(Math.random() * 5)]],
+  });
+}
+
+// 生成散点数据
+const scatterData = MOCK_PRODUCTS.map(p => ({
+  value: [p.sugars, p.anomaly],
+  name: p.name,
+  country: p.country,
+  category: p.category,
+  sugars: p.sugars, salt: p.salt, fat: p.fat,
+  health: p.health, price: p.price,
+  flags: p.flags,
+  nutriscore: p.nutriscore, nutriscore_num: p.nutriscore_num,
+  nova: p.nova, completeness: p.completeness,
+  anomaly: p.anomaly, energy: p.energy,
+}));
+
+const priceScatterData = MOCK_PRODUCTS.filter(p => p.price > 0).map(p => ({
+  value: [p.price, p.health],
+  name: p.name,
+  country: p.country, category: p.category,
+  sugars: p.sugars, salt: p.salt, fat: p.fat,
+  health: p.health, price: p.price,
+  nutriscore: p.nutriscore, nutriscore_num: p.nutriscore_num,
+  anomaly: p.anomaly, energy: p.energy,
+  nova: p.nova, completeness: p.completeness,
+}));
+
+// ========== 初始化 ==========
+const mapChart = echarts.init(document.getElementById('chartMap'));
+const sunChart = echarts.init(document.getElementById('chartSunburst'));
+const anomalyChart = echarts.init(document.getElementById('chartAnomaly'));
+const priceChart = echarts.init(document.getElementById('chartPrice'));
+
+let selectedCountry = '';
+let selectedCategory = '';
+let currentMetric = 'health_score';
+let mapZoomedTo = null; // 当前聚焦的国家名，null = 世界视图
+
+// 各国本土中心坐标（从 GeoJSON 最大块多边形计算）
+const COUNTRY_CENTERS = {
+  'France': [2.75, 46.85],
+  'United States': [-89.55, 37.77],
+  'Germany': [11.29, 50.45],
+  'Spain': [-4.01, 40.83],
+  'United Kingdom': [-3.06, 54.34],
+  'Italy': [11.95, 44.61],
+  'Belgium': [4.84, 50.49],
+  'Netherlands': [5.51, 51.93],
+  'Switzerland': [8.37, 46.72],
+  'Canada': [-96.04, 59.28],
+};
+
+// ========== ① 世界地图 ==========
+function renderMap(metric) {
+  const metricKey = metric === 'health_score' ? 'health' : metric;
+
+  // 选中某国时：给其他国家设极小值 → visualMap 映射到最浅色来"淡化"
+  const data = COUNTRIES.map(c => {
+    if (!mapZoomedTo) return { name: c.enName, value: c[metricKey] || c.health };
+    const isSel = c.enName === mapZoomedTo;
+    return { name: c.enName, value: isSel ? (c[metricKey] || c.health) : -1 };
+  });
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      formatter: p => {
+        if (!p.value || p.value < 0) return p.name + '<br/><span style="color:#aaa">(未选中)</span>';
+        const c = COUNTRIES.find(x => x.enName === p.name);
+        return `<b>${p.name}</b><br/>样本数: ${c ? c.samples.toLocaleString() : '-'}<br/>${getMetricLabel()}: ${p.value.toFixed(2)}`;
+      }
+    },
+    visualMap: {
+      min: metric === 'health_score' || metric === 'nutriscore' ? 0.2 : 0,
+      max: metric === 'health_score' || metric === 'nutriscore' ? 0.8 : (metric === 'salt' ? 1.1 : 30),
+      text: [getMetricLabel(), ''],
+      textStyle: { color: '#8b5e3c' },
+      realtime: false, calculable: true,
+      inRange: { color: ['#fff2e0', '#fdbe7a', '#f47b3b', '#c0391b'] },
+      outOfRange: { color: '#e8ddd0' }
+    },
+    geo: {
+      map: 'world',
+      roam: true,
+      label: { show: false },
+      center: mapZoomedTo ? COUNTRY_CENTERS[mapZoomedTo] : undefined,
+      zoom: mapZoomedTo ? 3 : 1,
+      itemStyle: { borderColor: '#e8d5c4' },
+      emphasis: { itemStyle: { areaColor: '#f0a060' }, label: { show: true, color: '#4a3728' } },
+      regions: mapZoomedTo
+        ? COUNTRIES.map(c => ({
+            name: c.enName,
+            label: { show: c.enName === mapZoomedTo, fontSize: 16, fontWeight: 'bold', color: '#4a3728' }
+          }))
+        : []
+    },
+    series: [{
+      type: 'map', map: 'world', geoIndex: 0, data: data
+    }]
+  };
+  mapChart.setOption(option, { notMerge: false, lazyUpdate: false });
+  mapChart.off('click');
+  mapChart.on('click', params => {
+    if (params.name && COUNTRIES.find(c => c.enName === params.name)) {
+      selectedCountry = params.name;
+      mapZoomedTo = params.name;
+      document.getElementById('countrySelect').value = selectedCountry;
+      document.getElementById('backToWorld').style.display = 'inline-block';
+      refreshAll();
+    }
+  });
+}
+
+function resetMapView() {
+  mapZoomedTo = null;
+  selectedCountry = '';
+  document.getElementById('backToWorld').style.display = 'none';
+  document.getElementById('countrySelect').value = '';
+  renderMap(currentMetric);
+  renderSunburst();
+  renderAnomaly();
+  renderPrice();
+}
+
+function getMetricLabel() {
+  const map = { health_score: '健康评分', sugars: '糖含量(g)', salt: '盐含量(g)', fat: '脂肪(g)', energy: '能量(kcal)', nutriscore: 'Nutri-Score', nova: 'NOVA等级' };
+  return map[currentMetric] || currentMetric;
+}
+
+// ========== ② 旭日图（品类营养结构） ==========
+const SUNBURST_PALETTE = ['#fde2c3','#f8c891','#f5b87d','#f0a060','#e8924a','#d97a38','#c06a2a','#d4846a','#c07050','#e8c090','#f5d0a0','#edb88c'];
+
+function renderSunburst() {
+  const cats = selectedCategory
+    ? CATEGORIES.filter(c => c.enName === selectedCategory)
+    : CATEGORIES;
+  const metricKey = currentMetric === 'health_score' ? 'health' : currentMetric;
+  const allVals = CATEGORIES.map(c => c[metricKey] || 0);
+  const vMin = Math.min(...allVals), vMax = Math.max(...allVals);
+  const data = cats.map((c) => {
+    const val = c[metricKey] || 0;
+    const t = vMax > vMin ? (val - vMin) / (vMax - vMin) : 0.5;
+    const r = Math.round(255 - t * 70);
+    const g = Math.round(220 - t * 160);
+    const b = Math.round(190 - t * 150);
+    return {
+      name: c.name, value: c.samples,
+      itemStyle: { color: `rgb(${r},${g},${b})` }
+    };
+  });
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'item', formatter: p => {
+      const cat = CATEGORIES.find(c => c.name === p.name);
+      const mv = cat ? (cat[metricKey] ?? '-') : '-';
+      return `<b>${p.name}</b><br/>${getMetricLabel()}: ${typeof mv === 'number' ? mv.toFixed(1) : mv}<br/>样本: ${p.value?.toLocaleString()}<br/>占比: ${p.percent}%`;
+    }},
+    series: [{
+      type: 'sunburst',
+      data: data,
+      radius: ['22%', '88%'],
+      center: ['50%', '50%'],
+      label: { rotate: selectedCategory ? 0 : 'radial', fontSize: selectedCategory ? 22 : 12, fontWeight: 'bold', color: '#3e2723' },
+      emphasis: { itemStyle: { borderColor: '#c0391b', borderWidth: 3, shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.15)' } }
+    }]
+  };
+  sunChart.setOption(option, { notMerge: false, lazyUpdate: false });
+  sunChart.off('click');
+  sunChart.on('click', params => {
+    const cat = CATEGORIES.find(c => c.name === params.name);
+    if (cat) {
+      selectedCategory = selectedCategory === cat.enName ? '' : cat.enName;
+      document.getElementById('categorySelect').value = selectedCategory;
+      refreshAll();
+    }
+  });
+}
+
+// ========== ③ 异常散点图 ==========
+const AXIS_META = {
+  sugars:    { label: '糖含量 (g/100g)', unit: 'g' },
+  salt:      { label: '盐含量 (g/100g)', unit: 'g' },
+  fat:       { label: '脂肪 (g/100g)',  unit: 'g' },
+  health:    { label: '健康评分',        unit: '' },
+  price:     { label: '中位价格 (€)',    unit: '€' },
+  completeness: { label: '数据完整度',   unit: '' },
+  nutriscore_num:{ label: 'Nutri-Score', unit: '' },
+  nova:      { label: 'NOVA 等级',      unit: '' },
+  energy:    { label: '能量 (kcal)',     unit: 'kcal' },
+};
+// 品类颜色（8 种不同色相，区分度高）
+const CAT_COLORS = ['#e67e22','#3498db','#2ecc71','#9b59b6','#1abc9c','#e74c3c','#f1c40f','#e91e63'];
+const catColorMap = {};
+CATEGORIES.forEach((c, i) => { catColorMap[c.enName] = CAT_COLORS[i % CAT_COLORS.length]; });
+
+function renderAnomaly() {
+  let data = scatterData;
+  if (selectedCountry) data = data.filter(d => d.country === selectedCountry);
+  if (selectedCategory) data = data.filter(d => d.category === selectedCategory);
+
+  const xKey = document.getElementById('anomalyX').value;
+  const yKey = document.getElementById('anomalyY').value;
+  const xMeta = AXIS_META[xKey];
+  const yMeta = AXIS_META[yKey];
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      formatter: p => {
+        const d = p.data;
+        return `<b>${d?.name}</b><br/>品类: ${d?.category}<br/>国家: ${d?.country}<br/>${xMeta.label}: ${d?.[xKey]?.toFixed?.(2) ?? '-'} ${xMeta.unit}<br/>${yMeta.label}: ${d?.[yKey]?.toFixed?.(2) ?? '-'} ${yMeta.unit}<br/>异常度: ${d?.anomaly?.toFixed?.(2) ?? '-'}`;
+      }
+    },
+    legend: { data: CATEGORIES.map(c => c.name), top: 5, textStyle: { color: '#8b5e3c', fontSize: 10 }, itemGap: 8 },
+    grid: { left: 70, right: 30, top: 35, bottom: 50 },
+    xAxis: { name: xMeta.label, nameLocation: 'center', nameGap: 35, nameTextStyle: { color: '#8b5e3c', fontSize: 12 }, axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' } },
+    yAxis: { name: yMeta.label, nameLocation: 'center', nameGap: 50, nameTextStyle: { color: '#8b5e3c', fontSize: 12 }, axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' }, splitLine: { lineStyle: { color: '#f0e4d5' } } },
+    toolbox: { feature: { brush: { type: ['rect', 'polygon'] } }, right: 10, top: 5 },
+    brush: { toolbox: ['rect', 'polygon'], throttleType: 'debounce', throttleDelay: 300 },
+    series: CATEGORIES.map(cat => ({
+      name: cat.name,
+      type: 'scatter',
+      data: data
+        .filter(d => d.category === cat.enName)
+        .map(d => ({ ...d, value: [d[xKey], d[yKey]] })),
+      symbolSize: d => Math.min(22, Math.max(6, (d.anomaly || 1) * 3.5 + 4)),
+      itemStyle: { color: catColorMap[cat.enName], opacity: 0.75 },
+      emphasis: { itemStyle: { borderColor: '#333', borderWidth: 2, opacity: 1 } }
+    }))
+  };
+  anomalyChart.setOption(option, true);
+  anomalyChart.off('click');
+  anomalyChart.on('click', params => { if (params.data) showDetail(params.data, params.event); });
+  anomalyChart.off('brushSelected');
+  anomalyChart.on('brushSelected', params => {
+    if (params.batch && params.batch[0]?.selected?.length > 0) {
+      showDetail(params.batch[0].selected[0].data); // brush 没有精确鼠标位置，用默认中心
+    }
+  });
+}
+
+// ========== ④ 价格-营养关系 ==========
+function renderPrice() {
+  let data = priceScatterData;
+  if (selectedCountry) data = data.filter(d => d.country === selectedCountry);
+  if (selectedCategory) data = data.filter(d => d.category === selectedCategory);
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: { trigger: 'item', formatter: p => `<b>${p.data?.name}</b><br/>国家: ${p.data?.country}<br/>品类: ${p.data?.category}<br/>价格: €${p.data?.price?.toFixed(2)}<br/>健康评分: ${p.data?.health?.toFixed(2)}` },
+    grid: { left: 75, right: 25, top: 25, bottom: 60 },
+    xAxis: { name: '中位价格 (€)', nameLocation: 'center', nameGap: 42, nameTextStyle: { color: '#8b5e3c', fontSize: 12 }, axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' }, splitLine: { lineStyle: { color: '#f0e4d5' } } },
+    yAxis: { name: '健康评分', nameLocation: 'center', nameGap: 50, min: 0, max: 1, nameTextStyle: { color: '#8b5e3c', fontSize: 12 }, axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' }, splitLine: { lineStyle: { color: '#f0e4d5' } } },
+    series: [{
+      type: 'scatter',
+      data: data,
+      symbolSize: 10,
+      itemStyle: { color: d => (d.health || 0.5) > 0.6 ? '#43a047' : (d.health || 0.5) > 0.35 ? '#f0a060' : '#d8433f', opacity: 0.8 },
+      markLine: {
+        silent: true,
+        data: [{ type: 'average', name: '平均健康评分', lineStyle: { color: '#d36a2c', type: 'dashed' } }],
+        label: { color: '#8b5e3c' }
+      }
+    }]
+  };
+  priceChart.setOption(option, true);
+  priceChart.off('click');
+  priceChart.on('click', params => { if (params.data) showDetail({ ...params.data, name: params.data.name, country: params.data.country, category: params.data.category }, params.event); });
+}
+
+// ========== ⑤ 产品详情 ==========
+let lastClickPos = { x: 0.5, y: 0.5 }; // 默认中心
+
+function showDetail(data, event) {
+  if (!data) return;
+  const panel = document.querySelector('.panel-detail');
+  // 从点击事件取位置，转换为 panel 内百分比
+  if (event) {
+    const rect = panel.getBoundingClientRect();
+    const cx = ((event.clientX - rect.left) / rect.width) * 100;
+    const cy = ((event.clientY - rect.top) / rect.height) * 100;
+    lastClickPos = { x: Math.max(0, Math.min(100, cx)), y: Math.max(0, Math.min(100, cy)) };
+  }
+  panel.style.setProperty('--detail-x', lastClickPos.x + '%');
+  panel.style.setProperty('--detail-y', lastClickPos.y + '%');
+
+  const flagNames = { high_sugar: '高糖', high_salt: '高盐', high_fat: '高脂', high_price_low_health: '高价低健康' };
+  const html = `
+    <div class="detail-card">
+      <h4>📦 ${data.name || data.name}</h4>
+      <div class="detail-row"><span class="detail-label">国家</span><span class="detail-value">${data.country}</span></div>
+      <div class="detail-row"><span class="detail-label">品类</span><span class="detail-value">${data.category}</span></div>
+      <div class="detail-row"><span class="detail-label">Nutri-Score</span><span class="detail-value">${data.nutriscore || '-'}</span></div>
+      <div class="detail-row"><span class="detail-label">NOVA 等级</span><span class="detail-value">${data.nova || '-'}</span></div>
+    </div>
+    <div class="detail-card">
+      <h4>🔬 营养指标</h4>
+      <div class="detail-row"><span class="detail-label">糖</span><span class="detail-value">${data.sugars?.toFixed(1)} g</span></div>
+      <div class="detail-row"><span class="detail-label">盐</span><span class="detail-value">${data.salt?.toFixed(2)} g</span></div>
+      <div class="detail-row"><span class="detail-label">脂肪</span><span class="detail-value">${data.fat?.toFixed(1)} g</span></div>
+      <div class="detail-row"><span class="detail-label">健康评分</span><span class="detail-value">${data.health?.toFixed(2)}</span></div>
+    </div>
+    <div class="detail-card">
+      <h4>📊 派生指标</h4>
+      <div class="detail-row"><span class="detail-label">异常度</span><span class="detail-value">${data.anomaly?.toFixed(2)}</span></div>
+      <div class="detail-row"><span class="detail-label">价格</span><span class="detail-value">€${data.price?.toFixed(2)}</span></div>
+      <div class="detail-row"><span class="detail-label">数据完整度</span><span class="detail-value">${data.completeness ? (data.completeness * 100).toFixed(0) + '%' : '-'}</span></div>
+      <div>
+        ${(data.flags || []).map(f => `<span class="flag-tag flag-${f.includes('sugar') || f.includes('salt') || f.includes('fat') ? 'bad' : 'warn'}">${flagNames[f] || f}</span>`).join('')}
+        ${(!data.flags || data.flags.length === 0) ? '<span class="flag-tag flag-good">正常</span>' : ''}
+      </div>
+    </div>
+  `;
+  const titleEl = panel.querySelector('.panel-title');
+  titleEl.innerHTML = `⑤ 产品详情 — <b>${data.name}</b> <button onclick="hideDetail()" style="float:right;background:none;border:1px solid #dcc8b0;border-radius:4px;padding:2px 10px;cursor:pointer;color:#8b5e3c;font-size:12px;">✕ 关闭</button>`;
+  document.getElementById('detailContent').innerHTML = html;
+  panel.classList.add('show');
+}
+function hideDetail() {
+  document.querySelector('.panel-detail').classList.remove('show');
+}
+
+// ========== 工具函数 ==========
+function refreshAll() {
+  renderMap(currentMetric);
+  renderSunburst();
+  renderAnomaly();
+  renderPrice();
+}
+
+function populateSelectors() {
+  const countrySel = document.getElementById('countrySelect');
+  COUNTRIES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.enName; opt.textContent = `${c.name} (${(c.samples / 1000).toFixed(0)}k)`;
+    countrySel.appendChild(opt);
+  });
+  const catSel = document.getElementById('categorySelect');
+  CATEGORIES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.enName; opt.textContent = `${c.name} (${(c.samples / 1000).toFixed(0)}k)`;
+    catSel.appendChild(opt);
+  });
+}
+
+document.getElementById('countrySelect').addEventListener('change', e => {
+  selectedCountry = e.target.value; refreshAll();
+});
+document.getElementById('categorySelect').addEventListener('change', e => {
+  selectedCategory = e.target.value; refreshAll();
+});
+document.getElementById('metricSelect').addEventListener('change', e => {
+  currentMetric = e.target.value; renderMap(currentMetric); renderSunburst();
+});
+document.getElementById('anomalyX').addEventListener('change', () => renderAnomaly());
+document.getElementById('anomalyY').addEventListener('change', () => renderAnomaly());
+document.getElementById('resetBtn').addEventListener('click', () => {
+  selectedCountry = ''; selectedCategory = ''; currentMetric = 'health_score'; mapZoomedTo = null;
+  document.getElementById('countrySelect').value = '';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('metricSelect').value = 'health_score';
+  document.getElementById('backToWorld').style.display = 'none';
+  hideDetail();
+  refreshAll();
+});
+
+// ========== 自适应 ==========
+window.addEventListener('resize', () => {
+  mapChart.resize(); sunChart.resize(); anomalyChart.resize(); priceChart.resize();
+});
+
+// ========== 启动 ==========
+fetch('data/world.json')
+  .then(r => r.json())
+  .then(geoJson => {
+    echarts.registerMap('world', geoJson);
+    populateSelectors();
+    refreshAll();
+  })
+  .catch(() => {
+    // 如果本地文件也加载失败，柱状图兜底
+    const barChart = echarts.init(document.getElementById('chartMap'));
+    barChart.setOption({
+      title: { text: '样本分布', textStyle: { color: '#8b5e3c', fontSize: 14 }, left: 'center', top: 10 },
+      tooltip: {},
+      grid: { left: 100, right: 40, top: 40, bottom: 20 },
+      xAxis: { type: 'value', axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' } },
+      yAxis: { type: 'category', data: COUNTRIES.map(c => c.name).reverse(), axisLine: { lineStyle: { color: '#dcc8b0' } }, axisLabel: { color: '#8b5e3c' } },
+      series: [{ type: 'bar', data: COUNTRIES.map(c => c.samples).reverse(), itemStyle: { color: '#f0a060' } }]
+    });
+    populateSelectors();
+    renderSunburst(); renderAnomaly(); renderPrice();
+  });
+</script>
+</body>
+</html>
