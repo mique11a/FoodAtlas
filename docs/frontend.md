@@ -7,9 +7,9 @@
 | 项 | 选择 | 理由 |
 |---|---|---|
 | 图表库 | ECharts 5.5（CDN） | 内置地图、旭日图、散点图、平行坐标，中文文档完善 |
-| 架构 | 纯静态 HTML + JS | 原型阶段零构建工具，一个文件即开即用 |
+| 架构 | 纯静态 HTML + JS + Flask | 前端保持单文件原型，后端只做 parquet 查询和 JSON 输出 |
 | 地图数据 | 本地 `frontend/data/world.json` | 避免 CDN 网络问题，文件约 1MB |
-| 本地运行 | `python -m http.server 8080` | 浏览器 `file://` 协议会拦截 fetch 请求 |
+| 本地运行 | `conda activate foodatlas && python app.py` | 前端通过本地后端读取真实 parquet 数据 |
 
 ## 文件结构
 
@@ -18,6 +18,8 @@ frontend/
 ├── index.html          # 主页面（单文件包含 CSS + JS）
 └── data/
     └── world.json      # 世界地图 GeoJSON（Apache ECharts 官方源）
+
+app.py                  # 最小 Flask 后端，提供 parquet 查询接口
 ```
 
 ## 五个视图详情
@@ -102,34 +104,22 @@ refreshAll()
 重置 → 清空所有状态 → refreshAll()
 ```
 
-## 数据对接（待实现）
+## 数据对接
 
-当前所有数据为 JavaScript 硬编码 mock。后端完成后替换方式：
-
-```javascript
-// 当前（mock）
-const data = scatterData;
-
-// 未来（真实 API）
-const data = await fetch(`/api/products?country=${selectedCountry}&category=${selectedCategory}`)
-  .then(r => r.json());
-```
-
-后端只需提供约 3-4 个接口：
+当前前端已切换到最小化后端查询模式，后端只提供 3 个接口：
 
 | 接口 | 参数 | 返回 | 用途 |
 |---|---|---|---|
-| `/api/countries` | metric | 国家聚合表 | ① 地图 |
-| `/api/categories` | metric | 品类聚合表 | ② 旭日图 |
-| `/api/products/scatter` | country, category | 产品行列表 | ③④ 散点 |
-| `/api/products/:id` | - | 单品全字段 + 分位数 | ⑤ 详情 |
+| `/api/bootstrap` | - | 国家/品类聚合表 | ①② 初始化 |
+| `/api/products/anomaly` | country, category, limit | 产品行列表 | ③ 异常散点 |
+| `/api/products/price` | country, category, currency, limit | 价格样本列表 | ④ 价格散点 |
 
 ## 运行方式
 
 ```bash
-cd frontend
-python -m http.server 8080
-# 浏览器打开 http://localhost:8080
+conda activate foodatlas
+python app.py
+# 浏览器打开 http://127.0.0.1:8080
 ```
 
-无需安装依赖，ECharts 从 CDN 加载，地图从本地文件加载。
+需安装 `flask`、`polars` 和 `pyarrow`。ECharts 从 CDN 加载，地图从本地文件加载。

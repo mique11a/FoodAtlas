@@ -131,11 +131,12 @@ python scripts/build_analysis_table.py
 
 ## 前端原型
 
-已完成基于 ECharts 的前端原型，见 [frontend/index.html](frontend/index.html)。技术选型：
+已完成基于 ECharts 的前端原型，并新增最小化 Flask 后端接入真实数据，见 [frontend/index.html](frontend/index.html) 和 [app.py](app.py)。技术选型：
 
-- **ECharts 5.5**（CDN 引入），纯前端无构建工具
+- **ECharts 5.5**（CDN 引入），前端仍为单文件原型
+- **Flask + Polars** 作为最小查询后端，直接读取 `datasets_preprocessed/products_analysis.parquet`
 - **世界地图 GeoJSON** 本地托管 [frontend/data/world.json](frontend/data/world.json)
-- 本地开发：`cd frontend && python -m http.server 8080`，浏览器访问 `localhost:8080`
+- 本地开发：`conda activate foodatlas && python app.py`，浏览器访问 `http://127.0.0.1:8080`
 
 ### 已实现的五个视图
 
@@ -144,7 +145,7 @@ python scripts/build_analysis_table.py
 | ① | 全球食品样本概览地图 | 地图热力图 | 点击国家聚焦 → 全视图联动过滤；顶部指标切换器同步改变颜色映射 |
 | ② | 品类营养结构视图 | 旭日图 | 颜色随顶部指标变化；点击品类 → 散点图过滤；选中后文字放正变大 |
 | ③ | 产品异常检测散点图 | 散点图（按品类分色） | 横纵轴下拉切换变量；点大小 = 异常度；框选/点击 → 详情弹出 |
-| ④ | 价格-营养关系视图 | 散点图 | 点击产品 → 详情弹出 |
+| ④ | 价格-营养关系视图 | 散点图 | 按筛选条件向后端查询同币种价格样本；点击产品 → 详情弹出 |
 | ⑤ | 产品详情解释视图 | 详情卡片 | 默认隐藏，点击③④散点从点击位置圆形扩散弹出，可关闭 |
 
 ### 联动逻辑
@@ -161,6 +162,6 @@ python scripts/build_analysis_table.py
 
 ## 下一步计划
 
-- 基于 `products_analysis.parquet` 设计国家级、品类级和品牌级聚合表。
-- 编写 Flask 后端，将前端 mock 数据替换为真实 parquet 查询结果。
+- 继续补充品牌级聚合与更细粒度的详情解释信息。
+- 针对价格视图增加币种显式切换与样本规模提示。
 - 围绕主要国家和主要品类补充案例分析，验证派生指标是否符合预期。
