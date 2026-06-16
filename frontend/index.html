@@ -49,6 +49,8 @@
   .banner-subtitle span { padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(201,169,126,0.42); background: rgba(255,251,244,0.9); }
   .dashboard { display: flex; flex-direction: column; gap: 16px; }
   .row-major { display: grid; gap: 14px; grid-template-columns: minmax(0,1.08fr) minmax(0,0.92fr); }
+  .row-minor { display: grid; gap: 14px; grid-template-columns: minmax(0,1.24fr) minmax(340px,0.76fr); }
+  .mini-stack { display: grid; grid-template-rows: minmax(230px,1fr) minmax(230px,1fr); gap: 14px; }
   .panel {
     display: flex; flex-direction: column; min-height: 0;
     border: 1px solid var(--border); border-radius: 12px;
@@ -74,6 +76,10 @@
   .panel-map { min-height: 760px; }
   .panel-scatter { min-height: 480px; }
   .panel-category { min-height: 480px; }
+  .panel-parallel { min-height: 510px; }
+  .panel-heatmap { min-height: 230px; }
+  .panel-boxplot { min-height: 230px; }
+  .panel-table { min-height: 356px; }
   .controls-wrap {
     display: grid; grid-template-columns: minmax(0,1.35fr) minmax(560px,1fr);
     gap: 14px; padding: 14px; height: auto; align-items: start;
@@ -88,6 +94,7 @@
     width: 100%; padding: 8px 10px; border: 1px solid rgba(210,187,155,0.95);
     border-radius: 8px; background: #fff; font-size: 13px; color: var(--text); cursor: pointer;
   }
+  .control-value, .control-input { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 8px 10px; border: 1px solid rgba(210,187,155,0.95); border-radius: 8px; background: #fff; font-size: 13px; color: var(--text); }
   .control-actions { grid-column: span 4; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .ghost-btn, .solid-btn { padding: 8px 14px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(203,165,119,0.92); cursor: pointer; }
   .ghost-btn { background: rgba(255,251,244,0.95); color: var(--muted); }
@@ -200,8 +207,22 @@
   .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #f0b173, #d78346); }
   .explain-list { display: grid; gap: 10px; font-size: 12px; }
   .explain-item { padding: 10px 12px; border-left: 3px solid #d38d47; border-radius: 0 8px 8px 0; background: rgba(253,244,232,0.92); color: var(--text); }
+  .table-wrap { padding: 10px 12px 12px; height: 100%; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
+  .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; }
+  .table-toolbar-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .table-scroller { flex: 1; min-height: 0; overflow: auto; border-radius: 10px; }
+  .product-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; background: rgba(255,252,246,0.96); border: 1px solid rgba(219,197,168,0.9); border-radius: 10px; overflow: hidden; }
+  .product-table thead th { position: sticky; top: 0; z-index: 1; padding: 10px 8px; background: linear-gradient(180deg,#fbefd9,#f5e3c7); color: #76451f; border-bottom: 1px solid rgba(219,197,168,0.9); font-weight: 700; }
+  .product-table tbody td { padding: 9px 8px; border-bottom: 1px solid rgba(236,222,204,0.95); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .product-table tbody tr:nth-child(odd) { background: rgba(255,250,243,0.95); }
+  .badge-cell { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid rgba(209,182,145,0.9); background: #fff; color: var(--muted); font-size: 11px; }
+  .status-good { color: #577a44; border-color: rgba(125,164,100,0.55); background: #edf5e6; }
+  .status-warn { color: #9b6425; border-color: rgba(214,146,69,0.52); background: #fff2df; }
+  .status-bad { color: #9a463b; border-color: rgba(191,105,89,0.48); background: #fce8e3; }
+  .panel-note { padding: 0 12px 10px; color: var(--muted); font-size: 11px; }
   @media (max-width: 1360px) {
-    .row-major { grid-template-columns: 1fr; }
+    .row-major, .row-minor { grid-template-columns: 1fr; }
+    .mini-stack { grid-template-rows: repeat(2, minmax(220px,1fr)); }
     .panel-map { min-height: 1080px; }
     .map-stage { display: flex; flex-direction: column; gap: 12px; }
     .map-canvas { height: 620px; min-height: 620px; }
@@ -247,9 +268,14 @@
               <option value="fat">脂肪</option><option value="energy">能量</option><option value="nutriscore">Nutri-Score</option><option value="nova">NOVA等级</option>
             </select></div>
             <div class="control-item"><label>币种</label><select id="currencySelect"><option value="EUR">EUR</option><option value="USD">USD</option></select></div>
+            <div class="control-item"><label>品牌</label><div class="control-input"><span>Search brand</span><span>⌕</span></div></div>
+            <div class="control-item"><label>异常阈值</label><div class="control-value"><span>&gt; 2.0</span><span>▭</span></div></div>
+            <div class="control-item"><label>完整度阈值</label><div class="control-value"><span>&gt; 0.55</span><span>▭</span></div></div>
+            <div class="control-item"><label>价格区间</label><div class="control-value"><span>€0.5 - €8.0</span><span>▭</span></div></div>
             <div class="control-actions">
-              <button class="ghost-btn" id="resetBtn">重置视图</button>
-              <button class="ghost-btn" id="backToWorldBtn" style="display:none;">← 返回世界</button>
+              <button class="ghost-btn" id="saveFilterBtn" type="button">保存筛选</button>
+              <button class="ghost-btn" id="compareBtn" type="button">切换对比</button>
+              <button class="solid-btn" id="resetBtn">重置视图</button>
             </div>
           </div>
           <div class="kpi-block" id="kpiBlock">
@@ -320,6 +346,66 @@
         <div class="panel-body"><div id="chartSunburst" class="chart"></div></div>
       </section>
     </div>
+
+    <!-- ====== 5 & 6 & 7: 平行坐标 + 热力图 + 箱线图 ====== -->
+    <div class="row-minor">
+      <section class="panel panel-parallel">
+        <div class="panel-title">
+          <div class="panel-title-main"><span class="panel-index">5</span><h3>营养结构平行坐标图</h3></div>
+          <div class="chip-row"><span class="chip">糖</span><span class="chip">盐</span><span class="chip">脂肪</span><span class="chip">能量</span><span class="chip">健康</span><span class="chip">价格</span><span class="chip">异常</span><span class="chip">完整度</span></div>
+        </div>
+        <div class="panel-body"><div id="chartParallel" class="chart"></div></div>
+      </section>
+
+      <div class="mini-stack">
+        <section class="panel panel-heatmap">
+          <div class="panel-title">
+            <div class="panel-title-main"><span class="panel-index">6</span><h3>国家 × 品类矩阵热力图</h3></div>
+            <div class="chip-row"><span class="chip">价格-营养性价比</span></div>
+          </div>
+          <div class="panel-body"><div id="chartHeatmap" class="chart"></div></div>
+        </section>
+
+        <section class="panel panel-boxplot">
+          <div class="panel-title">
+            <div class="panel-title-main"><span class="panel-index">7</span><h3>价格分布箱线图</h3></div>
+            <div class="chip-row"><span class="chip">Sweet snacks</span><span class="chip">By Country</span></div>
+          </div>
+          <div class="panel-body"><div id="chartBoxplot" class="chart"></div></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ====== 8: 产品列表 ====== -->
+    <section class="panel panel-table">
+      <div class="panel-title">
+        <div class="panel-title-main"><span class="panel-index">8</span><h3>产品列表与对比表</h3></div>
+        <div class="chip-row"><span class="chip">按异常度降序</span><span class="chip">Top 12</span></div>
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div id="tableFilterLabel">当前筛选：全部 / 全部 / 异常度降序</div>
+            <div class="table-toolbar-right">
+              <div class="chip-row"><span class="chip">价格</span><span class="chip">健康</span><span class="chip">异常</span><span class="chip">完整度</span></div>
+            </div>
+          </div>
+          <div class="table-scroller">
+            <table class="product-table">
+              <thead>
+                <tr>
+                  <th style="width:15%">产品</th><th style="width:10%">品牌</th><th style="width:10%">国家</th>
+                  <th style="width:12%">品类</th><th style="width:8%">价格</th><th style="width:8%">健康分</th>
+                  <th style="width:8%">异常度</th><th style="width:7%">NOVA</th>
+                  <th style="width:8%">糖</th><th style="width:7%">完整度</th><th style="width:7%">状态</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 
@@ -404,6 +490,15 @@ function getMetricLabel(){
 const mapChart=echarts.init(document.getElementById('chartMap'));
 const anomalyChart=echarts.init(document.getElementById('chartAnomaly'));
 const sunChart=echarts.init(document.getElementById('chartSunburst'));
+const parallelChart=echarts.init(document.getElementById('chartParallel'));
+const heatmapChart=echarts.init(document.getElementById('chartHeatmap'));
+const boxplotChart=echarts.init(document.getElementById('chartBoxplot'));
+
+function quartiles(values){
+  const sorted=values.slice().sort((a,b)=>a-b);
+  const q=p=>{const pos=(sorted.length-1)*p,base=Math.floor(pos),rest=pos-base;return sorted[base+1]!==undefined?sorted[base]+rest*(sorted[base+1]-sorted[base]):sorted[base];};
+  return [sorted[0],q(0.25),q(0.5),q(0.75),sorted[sorted.length-1]];
+}
 
 // ========== 2: 地图 ==========
 function renderMap(){
@@ -430,8 +525,7 @@ function renderMap(){
       selectedCountry=params.name;mapZoomedTo=params.name;
       document.getElementById('countrySelect').value=selectedCountry;
       document.getElementById('mapBackBtn').style.display='inline-block';
-      document.getElementById('backToWorldBtn').style.display='inline-block';
-      updateKPIs();renderSunburst();renderAnomaly();renderMap();
+      updateKPIs();refreshViews();
     }
   });
 }
@@ -439,7 +533,6 @@ function resetMapView(){
   const prev=mapZoomedTo;
   mapZoomedTo=null;selectedCountry='';
   document.getElementById('mapBackBtn').style.display='none';
-  document.getElementById('backToWorldBtn').style.display='none';
   document.getElementById('countrySelect').value='';
   // 精准清除上一次聚焦国家的所有高亮/选中状态
   if(prev){
@@ -447,7 +540,7 @@ function resetMapView(){
     mapChart.dispatchAction({type:'unselect',seriesIndex:0,name:prev});
   }
   mapChart.dispatchAction({type:'downplay'});
-  renderMap();updateKPIs();renderSunburst();renderAnomaly();
+  updateKPIs();refreshViews();
 }
 document.getElementById('mapBackBtn').addEventListener('click',resetMapView);
 
@@ -477,7 +570,7 @@ function renderSunburst(){
   sunChart.off('click');
   sunChart.on('click',params=>{
     const cat=CATEGORIES.find(c=>c.zh===params.name);
-    if(cat){selectedCategory=selectedCategory===cat.en?'':cat.en;document.getElementById('categorySelect').value=selectedCategory;updateKPIs();renderAnomaly();renderSunburst();}
+    if(cat){selectedCategory=selectedCategory===cat.en?'':cat.en;document.getElementById('categorySelect').value=selectedCategory;updateKPIs();renderAnomaly();renderSunburst();renderParallel();renderBoxplot();renderTable();}
   });
 }
 
@@ -563,6 +656,75 @@ function showProductDetail(d,event){
   setDetailDrawer(true);
 }
 
+// ========== 5: 平行坐标 ==========
+function renderParallel(){
+  let data=MOCK_PRODUCTS;
+  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
+  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  parallelChart.setOption({
+    backgroundColor:'transparent',
+    parallelAxis:[
+      {dim:0,name:'糖',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:50},
+      {dim:1,name:'盐',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:2.5},
+      {dim:2,name:'脂肪',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:35},
+      {dim:3,name:'能量',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:50,max:520},
+      {dim:4,name:'健康',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.1,max:0.9},
+      {dim:5,name:'价格',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.4,max:7},
+      {dim:6,name:'异常',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:3.5},
+      {dim:7,name:'完整度',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.3,max:1.0}
+    ],
+    parallel:{left:38,right:26,top:26,bottom:20,parallelAxisDefault:{type:'value',nameLocation:'end',nameGap:10}},
+    tooltip:{formatter:p=>`${p.name}<br/>糖 ${p.value[0]}g · 盐 ${p.value[1]}g · 异常 ${p.value[6]}`},
+    series:[{name:'产品样本',type:'parallel',lineStyle:{width:1.4,opacity:0.36},
+      data:data.slice(0,48).map(item=>({name:item.name,value:[item.sugars,item.salt,item.fat,item.energy,item.health,item.price,item.anomaly,item.completeness],lineStyle:{color:CAT_COLORS[item.categoryEn]||'#c48346'}}))}]
+  });
+}
+
+// ========== 6: 热力图 ==========
+function renderHeatmap(){
+  const values=[];
+  COUNTRIES.forEach((country,row)=>{CATEGORIES.forEach((category,col)=>{const score=Number((country.priceCov*0.55+category.health*0.45+(rand()-0.5)*0.08).toFixed(2));values.push([col,row,score]);});});
+  heatmapChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{position:'top',formatter:p=>{const country=COUNTRIES[p.value[1]],category=CATEGORIES[p.value[0]];return `${country.zh} · ${category.zh}<br/>性价比指数: ${p.value[2].toFixed(2)}`;}},
+    grid:{left:84,right:14,top:16,bottom:48},
+    xAxis:{type:'category',data:CATEGORIES.map(c=>c.zh),axisLabel:{color:'#866b4f',interval:0,rotate:22,fontSize:10},axisTick:{show:false},splitArea:{show:true,areaStyle:{color:['rgba(255,248,239,0.4)','rgba(248,237,221,0.4)']}}},
+    yAxis:{type:'category',data:COUNTRIES.map(c=>c.zh),axisLabel:{color:'#866b4f',fontSize:11},axisTick:{show:false},splitArea:{show:true,areaStyle:{color:['rgba(255,248,239,0.4)','rgba(248,237,221,0.4)']}}},
+    visualMap:{min:0.3,max:0.75,right:2,top:'center',itemHeight:110,text:['高','低'],textStyle:{color:'#876b50',fontSize:10},inRange:{color:['#f9eedf','#eeb375','#cc7a43','#8d5e35']}},
+    series:[{type:'heatmap',data:values,label:{show:false},emphasis:{itemStyle:{borderColor:'#705339',borderWidth:1}}}]
+  });
+}
+
+// ========== 7: 箱线图 ==========
+function renderBoxplot(){
+  const focusCategory=selectedCategory||'Sweet snacks';
+  const boxData=COUNTRIES.map(country=>{const vals=MOCK_PRODUCTS.filter(item=>item.countryEn===country.en&&item.categoryEn===focusCategory).map(item=>item.price);return quartiles(vals);});
+  boxplotChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{trigger:'item',formatter:p=>{const[min,q1,median,q3,max]=p.data;return `${COUNTRIES[p.dataIndex].zh}<br/>min ${min.toFixed(2)} · Q1 ${q1.toFixed(2)}<br/>median ${median.toFixed(2)} · Q3 ${q3.toFixed(2)}<br/>max ${max.toFixed(2)}`;}},
+    grid:{left:56,right:18,top:28,bottom:44},
+    xAxis:{type:'category',data:COUNTRIES.map(c=>c.zh),axisLabel:{color:'#876b50',interval:0,rotate:22,fontSize:10},axisLine:{lineStyle:{color:'#d4bea1'}}},
+    yAxis:{type:'value',name:'价格 (EUR)',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},axisLine:{lineStyle:{color:'#d4bea1'}},splitLine:{lineStyle:{color:'#efe0cc'}}},
+    series:[{type:'boxplot',data:boxData,itemStyle:{color:'#f6e0c2',borderColor:'#c67b41',borderWidth:1.5}}]
+  });
+}
+
+// ========== 8: 产品列表 ==========
+function renderTable(){
+  let data=MOCK_PRODUCTS;
+  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
+  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  const rows=data.sort((a,b)=>b.anomaly-a.anomaly).slice(0,12);
+  const cName=selectedCountry?COUNTRIES.find(c=>c.en===selectedCountry)?.zh:'全部';
+  const catName=selectedCategory?CATEGORIES.find(c=>c.en===selectedCategory)?.zh:'全部';
+  document.getElementById('tableFilterLabel').textContent=`当前筛选：${cName} / ${catName} / 异常度降序`;
+  document.getElementById('tableBody').innerHTML=rows.map(item=>{
+    const st=item.flag==='high'?'异常':item.flag==='warn'?'关注':'正常';
+    const sc=item.flag==='high'?'status-bad':item.flag==='warn'?'status-warn':'status-good';
+    return `<tr><td title="${item.name}">${item.name}</td><td>${item.brand}</td><td>${item.countryZh}</td><td>${item.categoryZh}</td><td>€${item.price.toFixed(2)}</td><td>${item.health.toFixed(2)}</td><td>${item.anomaly.toFixed(2)}</td><td>${item.nova}</td><td>${item.sugars.toFixed(1)}g</td><td>${Math.round(item.completeness*100)}%</td><td><span class="badge-cell ${sc}">${st}</span></td></tr>`;
+  }).join('');
+}
+
 // ========== KPI 更新 ==========
 function updateKPIs(){
   let data=MOCK_PRODUCTS;
@@ -596,27 +758,52 @@ function populateSelectors(){
 }
 document.getElementById('countrySelect').addEventListener('change',e=>{
   selectedCountry=e.target.value;mapZoomedTo=selectedCountry||null;
-  if(selectedCountry){document.getElementById('mapBackBtn').style.display='inline-block';document.getElementById('backToWorldBtn').style.display='inline-block';}
-  else {document.getElementById('mapBackBtn').style.display='none';document.getElementById('backToWorldBtn').style.display='none';}
-  updateKPIs();renderMap();renderSunburst();renderAnomaly();
+  if(selectedCountry){document.getElementById('mapBackBtn').style.display='inline-block';}
+  else {document.getElementById('mapBackBtn').style.display='none';}
+  updateKPIs();refreshViews();
 });
-document.getElementById('categorySelect').addEventListener('change',e=>{selectedCategory=e.target.value;updateKPIs();renderSunburst();renderAnomaly();});
+document.getElementById('categorySelect').addEventListener('change',e=>{selectedCategory=e.target.value;updateKPIs();renderSunburst();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
 document.getElementById('metricSelect').addEventListener('change',e=>{currentMetric=e.target.value;renderMap();renderSunburst();});
+// 保存筛选：把当前筛选项存起来
+let savedFilters=null;
+document.getElementById('saveFilterBtn').addEventListener('click',()=>{
+  savedFilters={country:selectedCountry,category:selectedCategory,metric:currentMetric};
+  document.getElementById('saveFilterBtn').textContent='已保存';
+  setTimeout(()=>{document.getElementById('saveFilterBtn').textContent='保存筛选';},1500);
+});
+// 切换对比：在当前筛选和已保存的筛选之间切换
+document.getElementById('compareBtn').addEventListener('click',()=>{
+  if(!savedFilters){alert('请先保存一组筛选条件');return;}
+  const tmp={country:selectedCountry,category:selectedCategory,metric:currentMetric};
+  selectedCountry=savedFilters.country;selectedCategory=savedFilters.category;currentMetric=savedFilters.metric;
+  savedFilters=tmp;
+  document.getElementById('countrySelect').value=selectedCountry;
+  document.getElementById('categorySelect').value=selectedCategory;
+  document.getElementById('metricSelect').value=currentMetric;
+  if(selectedCountry){mapZoomedTo=selectedCountry;document.getElementById('mapBackBtn').style.display='inline-block';}
+  else resetMapView();
+  updateKPIs();refreshViews();
+  document.getElementById('compareBtn').textContent='已切换';
+  setTimeout(()=>{document.getElementById('compareBtn').textContent='切换对比';},1500);
+});
 document.getElementById('resetBtn').addEventListener('click',()=>{
   selectedCountry='';selectedCategory='';currentMetric='health_score';mapZoomedTo=null;
   document.getElementById('countrySelect').value='';document.getElementById('categorySelect').value='';document.getElementById('metricSelect').value='health_score';
-  document.getElementById('mapBackBtn').style.display='none';document.getElementById('backToWorldBtn').style.display='none';
-  setDetailDrawer(false);updateKPIs();renderMap();renderSunburst();renderAnomaly();
+  document.getElementById('mapBackBtn').style.display='none';
+  setDetailDrawer(false);updateKPIs();refreshViews();
 });
-document.getElementById('backToWorldBtn').addEventListener('click',resetMapView);
+function refreshViews(){
+  renderMap();renderSunburst();renderAnomaly();
+  renderParallel();renderHeatmap();renderBoxplot();renderTable();
+}
 
 // ========== 启动 ==========
 fetch('data/world.json').then(r=>r.json()).then(geoJson=>{
   echarts.registerMap('world-foodatlas',geoJson);
-  populateSelectors();updateKPIs();renderMap();renderSunburst();renderAnomaly();setDetailDrawer(false);
-}).catch(()=>{populateSelectors();updateKPIs();renderSunburst();renderAnomaly();});
+  populateSelectors();updateKPIs();refreshViews();setDetailDrawer(false);
+}).catch(()=>{populateSelectors();updateKPIs();renderSunburst();renderAnomaly();renderHeatmap();renderTable();});
 
-window.addEventListener('resize',()=>{mapChart.resize();sunChart.resize();anomalyChart.resize();});
+window.addEventListener('resize',()=>{mapChart.resize();sunChart.resize();anomalyChart.resize();parallelChart.resize();heatmapChart.resize();boxplotChart.resize();});
 </script>
 </body>
 </html>
