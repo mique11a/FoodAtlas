@@ -131,32 +131,54 @@ python scripts/build_analysis_table.py
 
 ## 前端原型
 
-已完成基于 ECharts 的前端原型，并新增最小化 Flask 后端接入真实数据，见 [frontend/index.html](frontend/index.html) 和 [app.py](app.py)。技术选型：
+已完成基于 ECharts 的 9-Panel 前端原型，见 [frontend/index.html](frontend/index.html)。组长初审稿见 [prototype_9panel_mock.html](prototype_9panel_mock.html)。
+
+### 技术选型
 
 - **ECharts 5.5**（CDN 引入），前端仍为单文件原型
 - **Flask + Polars** 作为最小查询后端，直接读取 `datasets_preprocessed/products_analysis.parquet`
 - **世界地图 GeoJSON** 本地托管 [frontend/data/world.json](frontend/data/world.json)
-- 本地开发：`conda activate foodatlas && python app.py`，浏览器访问 `http://127.0.0.1:8080`
+- 暖色纸质感 CSS（CSS 变量体系，适配 1360px / 900px 响应式断点）
+- 本地开发：`cd frontend && python -m http.server 8080`，浏览器访问 `http://localhost:8080`
 
-### 已实现的五个视图
+### 九个面板总览
 
-| # | 视图 | 图表类型 | 交互 |
-|---|---|---|---|
-| ① | 全球食品样本概览地图 | 地图热力图 | 点击国家聚焦 → 全视图联动过滤；顶部指标切换器同步改变颜色映射 |
-| ② | 品类营养结构视图 | 旭日图 | 颜色随顶部指标变化；点击品类 → 散点图过滤；选中后文字放正变大 |
-| ③ | 产品异常检测散点图 | 散点图（按品类分色） | 横纵轴下拉切换变量；点大小 = 异常度；框选/点击 → 详情弹出 |
-| ④ | 价格-营养关系视图 | 散点图 | 按筛选条件向后端查询同币种价格样本；点击产品 → 详情弹出 |
-| ⑤ | 产品详情解释视图 | 详情卡片 | 默认隐藏，点击③④散点从点击位置圆形扩散弹出，可关闭 |
+| # | 面板 | 图表类型 | 数据粒度 | 核心交互 |
+|---|---|---|---|---|
+| 1 | **全局控制台** | 筛选器 + KPI 卡片 | — | 国家/品类/品牌/主指标/异常阈值/完整度阈值/价格区间 七个筛选控件；5 个 KPI 实时随筛选更新；保存筛选 + 切换对比 + 重置视图 |
+| 2 | **全球地图总览** | 地图热力图 | 10 国聚合 | 点击国家聚焦放大（其他国家淡化，选中国高亮加粗）；返回世界按钮；主指标切换驱动颜色变化 |
+| 3 | **产品异常检测散点图** | 散点图（按品类分色） | 120 mock 产品 | 横/纵轴下拉自由切换变量（糖/盐/脂肪/健康/Nutri-Score/NOVA/能量/完整度/价格/异常度）；点大小=异常度；框选/点击触发详情 |
+| 4 | **品类营养结构视图** | 旭日图 | 8 品类聚合 | 颜色随主指标动态 RGB 插值；点击品类筛选散点与表格；选中后文字放正放大 |
+| 5 | **营养结构平行坐标图** | 平行坐标 | 产品级（前 48 条） | 轴=糖/盐/脂肪/能量/健康/价格/异常/完整度；品类着色；随筛选联动 |
+| 6 | **国家×品类矩阵热力图** | 热力图 | 10×8 矩阵 | 颜色=价格-营养性价比指数；暖色渐变 |
+| 7 | **价格分布箱线图** | 箱线图 | 国家×品类 | 展示各国家在选中品类下的价格五数概括（min-Q1-median-Q3-max） |
+| 8 | **产品列表与对比表** | 表格 | 产品级 Top N | 按异常/价格/健康/完整度排序（点击 chip 切换+升降序）；Top N 下拉可选 12/24/50/全部；点击行→详情；随所有筛选联动 |
+| 9 | **单产品解释** | 浮动详情卡片 | 单品 | `position: fixed` 跟随滚动；分类指标+条状基准图+解释摘要；由散点框选/点击/表格行点击触发 |
 
 ### 联动逻辑
 
 ```
-选国家（① 地图 / 下拉框）→ ②③④ 全部过滤
-选品类（② 旭日图 / 下拉框）→ ③④ 过滤
-切指标（顶部下拉框）→ ①② 颜色同步更新
-框选/点击散点（③④）→ ⑤ 动画弹出详情
-重置按钮 → 全部恢复全局视图
+Panel 1 筛选控件（国家/品类/品牌/指标/阈值/价格区间）
+  → Panel 2 地图重绘 + Panel 3 散点过滤 + Panel 4 旭日图重着色
+  → Panel 5 平行坐标过滤 + Panel 7 箱线图过滤
+  → Panel 8 表格过滤重排 + KPI 实时更新
+
+Panel 2 地图点击国家 → 聚焦放大 + 全部视图过滤（等价于 Panel 1 选择国家）
+Panel 4 旭日图点击品类 → 散点/平行坐标/箱线图/表格过滤（等价于 Panel 1 选择品类）
+Panel 3 / Panel 8 选中产品 → Panel 9 浮动详情面板滑出
 ```
+
+### 全局状态
+
+| 变量 | 作用 |
+|---|---|
+| `selectedCountry` / `selectedCategory` | 当前筛选的国家/品类 |
+| `currentMetric` | 主指标（影响 Panel 2 热力色 + Panel 4 扇区色） |
+| `mapZoomedTo` | 地图聚焦国家（null=世界视图） |
+| `selectedBrand` / `anomalyThreshold` / `completenessThreshold` / `priceRange` | Panel 1 精细筛选 |
+| `tableSortField` / `tableSortDir` / `tableTopN` | Panel 8 排序与行数 |
+
+所有筛选条件通过 `filterProducts()` 统一函数作用到各视图数据源。
 
 详细设计文档见 [docs/frontend.md](docs/frontend.md)。
 
