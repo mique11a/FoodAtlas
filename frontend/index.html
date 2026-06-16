@@ -450,19 +450,22 @@ const CATEGORIES = [
   { zh:'饮料',en:'Beverages',samples:36704,health:0.43,sugars:22.6,salt:0.09,fat:1.4,energy:186,nova:3.2,nutriscore_num:2.8},
   { zh:'零食',en:'Snacks',samples:33134,health:0.39,sugars:26.4,salt:1.31,fat:24.6,energy:477,nova:3.5,nutriscore_num:2.5},
   { zh:'发酵乳制品',en:'Fermented milk',samples:26770,health:0.66,sugars:13.9,salt:0.29,fat:7.8,energy:218,nova:1.8,nutriscore_num:3.6},
-  { zh:'乳制品',en:'Dairies',samples:11077,health:0.60,sugars:10.6,salt:0.56,fat:15.1,energy:313,nova:2.4,nutriscore_num:3.0}
+  { zh:'乳制品',en:'Dairies',samples:11077,health:0.60,sugars:10.6,salt:0.56,fat:15.1,energy:313,nova:2.4,nutriscore_num:3.0},
+  { zh:'植物基食品与饮料',en:'Plant-based foods & beverages',samples:1159,health:0.68,sugars:9.2,salt:0.55,fat:8.6,energy:260,nova:2.5,nutriscore_num:3.5},
+  { zh:'发酵食品',en:'Fermented foods',samples:577,health:0.63,sugars:11.5,salt:1.42,fat:10.2,energy:240,nova:2.0,nutriscore_num:3.3}
 ];
 const CAT_COLORS = {
   'Sweet snacks':'#d68849','Plant-based foods':'#7ca36b','Cereals & potatoes':'#c9a04e',
   'Desserts':'#c97563','Beverages':'#7ea7bf','Snacks':'#8b74b2',
-  'Fermented milk':'#71a48f','Dairies':'#ad8c68'
+  'Fermented milk':'#71a48f','Dairies':'#ad8c68',
+  'Plant-based foods & beverages':'#e8916a','Fermented foods':'#6ba3b5'
 };
 
 // Seeded random
 function seededRandom(seed) { let v=seed%2147483647; if(v<=0) v+=2147483646; return ()=>{ v=v*16807%2147483647; return (v-1)/2147483646; }; }
 const rand=seededRandom(20260615);
-const MOCK_PRODUCTS=Array.from({length:120},(_,i)=>{
-  const country=COUNTRIES[i%10], category=CATEGORIES[i%8];
+const MOCK_PRODUCTS=Array.from({length:500},(_,i)=>{
+  const country=COUNTRIES[i%10], category=CATEGORIES[Math.floor(i/50)%10];
   const health=Math.max(0.18,Math.min(0.87,category.health+(rand()-0.5)*0.28+(country.health-0.55)*0.24));
   const price=Math.max(0.65,country.price+(rand()-0.4)*2.2+(0.7-health)*1.7);
   const sugars=Math.max(0.1,category.sugars+(rand()-0.5)*9.8);
