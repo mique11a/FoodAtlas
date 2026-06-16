@@ -142,14 +142,14 @@
   }
   .map-back-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
   .detail-overlay-toggle {
-    position: absolute; top: 50%; right: 18px; transform: translateY(-50%);
+    position: fixed; top: 50%; right: 18px; transform: translateY(-50%);
     display: inline-flex; align-items: center; justify-content: center;
     width: 40px; height: 138px;
     border: 1px solid rgba(211,186,150,0.96); border-right: none;
     border-radius: 14px 0 0 14px;
     background: linear-gradient(180deg, #eca968, #d78443);
     color: #fff; box-shadow: 0 12px 28px rgba(112,81,46,0.18);
-    z-index: 7; cursor: pointer;
+    z-index: 99; cursor: pointer;
     writing-mode: vertical-rl; text-orientation: mixed;
     font-size: 12px; font-weight: 700;
     transition: right 0.28s ease, background 0.22s ease;
@@ -157,7 +157,7 @@
   .detail-overlay-toggle:hover { background: linear-gradient(180deg, #e59b56, #cb7339); }
   .detail-overlay-toggle.is-open { right: calc(var(--detail-drawer-width) + 22px); }
   .detail-overlay {
-    position: absolute; top: 18px; right: 18px; bottom: 18px;
+    position: fixed; top: 18px; right: 18px; bottom: 18px;
     width: var(--detail-drawer-width);
     display: flex; flex-direction: column;
     border: 1px solid rgba(215,191,157,0.95); border-radius: 16px;
