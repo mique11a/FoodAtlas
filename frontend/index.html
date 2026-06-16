@@ -268,10 +268,19 @@
               <option value="fat">脂肪</option><option value="energy">能量</option><option value="nutriscore">Nutri-Score</option><option value="nova">NOVA等级</option>
             </select></div>
             <div class="control-item"><label>币种</label><select id="currencySelect"><option value="EUR">EUR</option><option value="USD">USD</option></select></div>
-            <div class="control-item"><label>品牌</label><div class="control-input"><span>Search brand</span><span>⌕</span></div></div>
-            <div class="control-item"><label>异常阈值</label><div class="control-value"><span>&gt; 2.0</span><span>▭</span></div></div>
-            <div class="control-item"><label>完整度阈值</label><div class="control-value"><span>&gt; 0.55</span><span>▭</span></div></div>
-            <div class="control-item"><label>价格区间</label><div class="control-value"><span>€0.5 - €8.0</span><span>▭</span></div></div>
+            <div class="control-item"><label>品牌</label><div class="control-input"><input id="brandInput" placeholder="输入品牌名搜索..." style="border:none;outline:none;width:100%;font-size:13px;color:var(--text);background:transparent;"><span>⌕</span></div></div>
+            <div class="control-item"><label>异常阈值</label><select id="anomalyThresh">
+              <option value="0">不筛选</option><option value="1.0">&gt; 1.0</option><option value="1.5">&gt; 1.5</option>
+              <option value="2.0" selected>&gt; 2.0</option><option value="2.5">&gt; 2.5</option><option value="3.0">&gt; 3.0</option>
+            </select></div>
+            <div class="control-item"><label>完整度阈值</label><select id="completenessThresh">
+              <option value="0">不筛选</option><option value="0.4">&gt; 40%</option><option value="0.5">&gt; 50%</option>
+              <option value="0.55" selected>&gt; 55%</option><option value="0.6">&gt; 60%</option><option value="0.7">&gt; 70%</option>
+            </select></div>
+            <div class="control-item"><label>价格区间 (€)</label><select id="priceRange">
+              <option value="">不筛选</option><option value="0,1">€0 - 1</option><option value="1,2">€1 - 2</option>
+              <option value="2,3">€2 - 3</option><option value="3,5">€3 - 5</option><option value="5,8">€5 - 8</option>
+            </select></div>
             <div class="control-actions">
               <button class="ghost-btn" id="saveFilterBtn" type="button">保存筛选</button>
               <button class="ghost-btn" id="compareBtn" type="button">切换对比</button>
@@ -380,14 +389,24 @@
     <section class="panel panel-table">
       <div class="panel-title">
         <div class="panel-title-main"><span class="panel-index">8</span><h3>产品列表与对比表</h3></div>
-        <div class="chip-row"><span class="chip">按异常度降序</span><span class="chip">Top 12</span></div>
+        <div class="chip-row">
+          <span class="chip" id="tableSortLabel">按异常度降序</span>
+          <select id="tableTopN" style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--text);cursor:pointer;">
+            <option value="12" selected>Top 12</option><option value="24">Top 24</option><option value="50">Top 50</option><option value="999">全部</option>
+          </select>
+        </div>
       </div>
       <div class="panel-body">
         <div class="table-wrap">
           <div class="table-toolbar">
             <div id="tableFilterLabel">当前筛选：全部 / 全部 / 异常度降序</div>
             <div class="table-toolbar-right">
-              <div class="chip-row"><span class="chip">价格</span><span class="chip">健康</span><span class="chip">异常</span><span class="chip">完整度</span></div>
+              <div class="chip-row" id="tableSortChips">
+                <span class="chip" data-sort="price">价格 ▾</span>
+                <span class="chip" data-sort="health">健康</span>
+                <span class="chip" data-sort="anomaly" style="background:var(--accent-soft);font-weight:bold;">异常 ▾</span>
+                <span class="chip" data-sort="completeness">完整度</span>
+              </div>
             </div>
           </div>
           <div class="table-scroller">
@@ -468,6 +487,21 @@ const MOCK_PRODUCTS=Array.from({length:120},(_,i)=>{
 
 // ========== 全局状态 ==========
 let selectedCountry='',selectedCategory='',currentMetric='health_score',mapZoomedTo=null;
+let selectedBrand='',anomalyThreshold=2.0,completenessThreshold=0.55,priceRange='';
+
+// 统一过滤函数：应用所有筛选条件
+function filterProducts(data){
+  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
+  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  if(selectedBrand) data=data.filter(d=>d.brand.toLowerCase().includes(selectedBrand.toLowerCase()));
+  if(anomalyThreshold>0) data=data.filter(d=>d.anomaly>=anomalyThreshold);
+  if(completenessThreshold>0) data=data.filter(d=>d.completeness>=completenessThreshold);
+  if(priceRange){
+    const [lo,hi]=priceRange.split(',').map(Number);
+    data=data.filter(d=>d.price>=lo&&d.price<=hi);
+  }
+  return data;
+}
 const COUNTRY_CENTERS={
   'France':[2.75,46.85],'United States':[-89.55,37.77],'Germany':[11.29,50.45],
   'Spain':[-4.01,40.83],'United Kingdom':[-3.06,54.34],'Italy':[11.95,44.61],
@@ -576,9 +610,7 @@ function renderSunburst(){
 
 // ========== 3: 异常散点图 ==========
 function renderAnomaly(){
-  let data=MOCK_PRODUCTS;
-  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
-  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  let data=filterProducts(MOCK_PRODUCTS);
   const xKey=document.getElementById('anomalyX').value;
   const yKey=document.getElementById('anomalyY').value;
   const xMeta=AXIS_META[xKey],yMeta=AXIS_META[yKey];
@@ -658,9 +690,7 @@ function showProductDetail(d,event){
 
 // ========== 5: 平行坐标 ==========
 function renderParallel(){
-  let data=MOCK_PRODUCTS;
-  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
-  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  let data=filterProducts(MOCK_PRODUCTS);
   parallelChart.setOption({
     backgroundColor:'transparent',
     parallelAxis:[
@@ -710,26 +740,38 @@ function renderBoxplot(){
 }
 
 // ========== 8: 产品列表 ==========
+let tableSortField='anomaly',tableSortDir='desc',tableTopN=12;
 function renderTable(){
-  let data=MOCK_PRODUCTS;
-  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
-  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
-  const rows=data.sort((a,b)=>b.anomaly-a.anomaly).slice(0,12);
+  let data=filterProducts(MOCK_PRODUCTS);
+  // 按当前排序字段 + 方向
+  data.sort((a,b)=>{
+    const va=a[tableSortField]||0,vb=b[tableSortField]||0;
+    return tableSortDir==='desc'?vb-va:va-vb;
+  });
+  const rows=data.slice(0,tableTopN);
+  const sortLabel={price:'价格',health:'健康',anomaly:'异常度',completeness:'完整度'}[tableSortField];
+  const dirLabel=tableSortDir==='desc'?'降序':'升序';
   const cName=selectedCountry?COUNTRIES.find(c=>c.en===selectedCountry)?.zh:'全部';
   const catName=selectedCategory?CATEGORIES.find(c=>c.en===selectedCategory)?.zh:'全部';
-  document.getElementById('tableFilterLabel').textContent=`当前筛选：${cName} / ${catName} / 异常度降序`;
+  document.getElementById('tableSortLabel').textContent=`按${sortLabel}${dirLabel}`;
+  document.getElementById('tableFilterLabel').textContent=`当前筛选：${cName} / ${catName} / ${sortLabel}${dirLabel}`;
   document.getElementById('tableBody').innerHTML=rows.map(item=>{
     const st=item.flag==='high'?'异常':item.flag==='warn'?'关注':'正常';
     const sc=item.flag==='high'?'status-bad':item.flag==='warn'?'status-warn':'status-good';
-    return `<tr><td title="${item.name}">${item.name}</td><td>${item.brand}</td><td>${item.countryZh}</td><td>${item.categoryZh}</td><td>€${item.price.toFixed(2)}</td><td>${item.health.toFixed(2)}</td><td>${item.anomaly.toFixed(2)}</td><td>${item.nova}</td><td>${item.sugars.toFixed(1)}g</td><td>${Math.round(item.completeness*100)}%</td><td><span class="badge-cell ${sc}">${st}</span></td></tr>`;
+    return `<tr data-id="${item.id}" style="cursor:pointer;" title="点击查看产品详情"><td>${item.name}</td><td>${item.brand}</td><td>${item.countryZh}</td><td>${item.categoryZh}</td><td>€${item.price.toFixed(2)}</td><td>${item.health.toFixed(2)}</td><td>${item.anomaly.toFixed(2)}</td><td>${item.nova}</td><td>${item.sugars.toFixed(1)}g</td><td>${Math.round(item.completeness*100)}%</td><td><span class="badge-cell ${sc}">${st}</span></td></tr>`;
   }).join('');
+  // 行点击 → 打开产品详情
+  document.querySelectorAll('#tableBody tr').forEach(tr=>{
+    tr.addEventListener('click',()=>{
+      const item=MOCK_PRODUCTS.find(p=>p.id==tr.dataset.id);
+      if(item) showProductDetail(item);
+    });
+  });
 }
 
 // ========== KPI 更新 ==========
 function updateKPIs(){
-  let data=MOCK_PRODUCTS;
-  if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
-  if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
+  let data=filterProducts(MOCK_PRODUCTS);
   const n=data.length;
   const avgH=data.reduce((s,d)=>s+d.health,0)/n||0;
   const avgP=data.reduce((s,d)=>s+d.price,0)/n||0;
@@ -764,6 +806,13 @@ document.getElementById('countrySelect').addEventListener('change',e=>{
 });
 document.getElementById('categorySelect').addEventListener('change',e=>{selectedCategory=e.target.value;updateKPIs();renderSunburst();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
 document.getElementById('metricSelect').addEventListener('change',e=>{currentMetric=e.target.value;renderMap();renderSunburst();});
+document.getElementById('brandInput').addEventListener('input',e=>{selectedBrand=e.target.value.trim();updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+document.getElementById('anomalyThresh').addEventListener('change',e=>{anomalyThreshold=+e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+document.getElementById('completenessThresh').addEventListener('change',e=>{completenessThreshold=+e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+document.getElementById('priceRange').addEventListener('change',e=>{priceRange=e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+// 表格排序 chip
+document.querySelectorAll('#tableSortChips .chip').forEach(chip=>{chip.addEventListener('click',function(){const f=this.dataset.sort;if(f===tableSortField){tableSortDir=tableSortDir==='desc'?'asc':'desc';}else{tableSortField=f;tableSortDir='desc';}document.querySelectorAll('#tableSortChips .chip').forEach(c=>{c.style.background='';c.style.fontWeight='';const label={price:'价格',health:'健康',anomaly:'异常',completeness:'完整度'}[c.dataset.sort];c.textContent=label;});this.style.background='var(--accent-soft)';this.style.fontWeight='bold';const arrow=tableSortDir==='desc'?' ▾':' ▴';const label={price:'价格',health:'健康',anomaly:'异常',completeness:'完整度'}[f];this.textContent=label+arrow;renderTable();});});
+document.getElementById('tableTopN').addEventListener('change',e=>{tableTopN=+e.target.value;renderTable();});
 // 保存筛选：把当前筛选项存起来
 let savedFilters=null;
 document.getElementById('saveFilterBtn').addEventListener('click',()=>{
@@ -788,7 +837,10 @@ document.getElementById('compareBtn').addEventListener('click',()=>{
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{
   selectedCountry='';selectedCategory='';currentMetric='health_score';mapZoomedTo=null;
+  selectedBrand='';anomalyThreshold=2.0;completenessThreshold=0.55;priceRange='';
   document.getElementById('countrySelect').value='';document.getElementById('categorySelect').value='';document.getElementById('metricSelect').value='health_score';
+  document.getElementById('brandInput').value='';document.getElementById('anomalyThresh').value='2.0';document.getElementById('completenessThresh').value='0.55';document.getElementById('priceRange').value='';
+  tableSortField='anomaly';tableSortDir='desc';tableTopN=12;document.getElementById('tableTopN').value='12';
   document.getElementById('mapBackBtn').style.display='none';
   setDetailDrawer(false);updateKPIs();refreshViews();
 });
