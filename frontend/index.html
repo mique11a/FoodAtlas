@@ -556,13 +556,14 @@ function renderMap(){
       return c?`<b>${c.zh} / ${c.en}</b><br/>${getMetricLabel()}: ${p.value.toFixed(2)}<br/>样本: ${c.samples.toLocaleString()}<br/>均价: €${c.price.toFixed(2)}`:`${p.name}`;
     }},
     visualMap:{min:metricKey==='health'||metricKey==='nutriscore'?0.2:0,max:metricKey==='health'||metricKey==='nutriscore'?0.8:(metricKey==='salt'?1.1:35),text:[getMetricLabel(),''],textStyle:{color:'#876b50',fontSize:11},left:22,bottom:20,calculable:true,itemWidth:12,itemHeight:126,inRange:{color:['#f6ddbc','#eca864','#d27b3f','#94663b']},outOfRange:{color:'#ecd8bb'}},
-    geo:{map:'world-foodatlas',roam:mapZoomedTo?false:true,left:110,right:92,top:24,bottom:40,zoom:mapZoomedTo?3:1.06,center:mapZoomedTo?COUNTRY_CENTERS[mapZoomedTo]:undefined,itemStyle:{areaColor:'#ecd8bb',borderColor:'#b78d63',borderWidth:0.9},emphasis:{itemStyle:{areaColor:'#d78a49'},label:{show:!mapZoomedTo?false:true,color:'#5c3a1e'}},regions:mapZoomedTo?COUNTRIES.map(c=>({name:c.en,label:{show:c.en===mapZoomedTo,fontSize:16,fontWeight:'bold',color:'#4a3728'}})):[]},
+    geo:{map:'world-foodatlas',roam:false,left:110,right:92,top:24,bottom:40,zoom:mapZoomedTo?3:1.06,center:mapZoomedTo?COUNTRY_CENTERS[mapZoomedTo]:undefined,itemStyle:{areaColor:'#ecd8bb',borderColor:'#b78d63',borderWidth:0.9},emphasis:{itemStyle:{areaColor:'#d78a49'},label:{show:!mapZoomedTo?false:true,color:'#5c3a1e'}},regions:mapZoomedTo?COUNTRIES.map(c=>({name:c.en,label:{show:c.en===mapZoomedTo,fontSize:16,fontWeight:'bold',color:'#4a3728'}})):[]},
     series:[{type:'map',map:'world-foodatlas',geoIndex:0,data,itemStyle:{borderColor:'#b78d63',borderWidth:0.9}}]
   };
   mapChart.setOption(option,{notMerge:false,lazyUpdate:false});
   mapChart.off('click');
   mapChart.on('click',params=>{
     if(params.name&&COUNTRIES.find(c=>c.en===params.name)){
+      if(params.name===mapZoomedTo){resetMapView();return;}
       selectedCountry=params.name;mapZoomedTo=params.name;
       document.getElementById('countrySelect').value=selectedCountry;
       document.getElementById('mapBackBtn').style.display='inline-block';
