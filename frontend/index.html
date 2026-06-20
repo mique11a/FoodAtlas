@@ -49,8 +49,8 @@
   .banner-subtitle span { padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(201,169,126,0.42); background: rgba(255,251,244,0.9); }
   .dashboard { display: flex; flex-direction: column; gap: 16px; }
   .row-major { display: grid; gap: 14px; grid-template-columns: minmax(0,1.08fr) minmax(0,0.92fr); }
-  .row-minor { display: grid; gap: 14px; grid-template-columns: minmax(0,1.24fr) minmax(340px,0.76fr); }
-  .mini-stack { display: grid; grid-template-rows: minmax(230px,1fr) minmax(230px,1fr); gap: 14px; }
+  .row-minor { display: grid; gap: 14px; grid-template-columns: minmax(0,1.16fr) minmax(360px,0.84fr); }
+  .row-brand { display: block; }
   .panel {
     display: flex; flex-direction: column; min-height: 0;
     border: 1px solid var(--border); border-radius: 12px;
@@ -77,9 +77,11 @@
   .panel-map { min-height: 760px; }
   .panel-scatter { min-height: 480px; }
   .panel-category { min-height: 480px; }
-  .panel-parallel { min-height: 510px; }
-  .panel-heatmap { min-height: 230px; }
-  .panel-boxplot { min-height: 230px; }
+  .panel-price-relation { min-height: 510px; }
+  .panel-heatmap { min-height: 420px; }
+  .panel-boxplot { min-height: 510px; }
+  .panel-heatmap .panel-body { min-height: 364px; }
+  .panel-heatmap .chart { min-height: 364px; }
   .panel-table { min-height: 356px; }
   .controls-wrap {
     display: grid; grid-template-columns: minmax(0,1.12fr) minmax(560px,1.28fr);
@@ -117,11 +119,32 @@
     border: 1px solid rgba(208,181,145,0.85);
     background: rgba(255,250,242,0.95); color: var(--muted); font-size: 11px;
   }
+  .chip.is-active {
+    background: var(--accent-soft);
+    color: #6f4421;
+    font-weight: 700;
+    border-color: rgba(203,165,119,0.92);
+  }
+  .header-inline-select {
+    min-width: 140px;
+    padding: 4px 8px;
+    border: 1px solid rgba(210,187,155,0.95);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .panel-chip-btn {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
   .chart { width: 100%; height: 100%; }
   .panel-map .panel-body { padding: 12px; min-height: 700px; }
   .map-stage { position: relative; width: 100%; height: 100%; min-height: 700px; }
   .map-canvas {
-    --detail-drawer-width: min(360px, 32%);
+    --detail-drawer-width: clamp(620px, 52vw, 1120px);
     position: relative; width: 100%; height: 100%; min-height: 700px;
     border: 1px solid rgba(215,191,157,0.9); border-radius: 16px; overflow: hidden;
     background: radial-gradient(circle at 50% 42%, rgba(255,247,234,0.78), rgba(246,230,205,0.46) 34%, rgba(233,211,180,0.28) 100%), linear-gradient(180deg, #f1e0c5, #ead7b8);
@@ -156,16 +179,19 @@
     transition: right 0.28s ease, background 0.22s ease;
   }
   .detail-overlay-toggle:hover { background: linear-gradient(180deg, #e59b56, #cb7339); }
-  .detail-overlay-toggle.is-open { right: calc(var(--detail-drawer-width) + 22px); }
+  .detail-overlay-toggle.is-open { opacity: 0; pointer-events: none; }
   .detail-overlay {
     position: fixed; top: 18px; right: 18px; bottom: 18px;
     width: var(--detail-drawer-width);
+    min-width: 620px;
+    max-width: min(92vw, 1280px);
     display: flex; flex-direction: column;
     border: 1px solid rgba(215,191,157,0.95); border-radius: 16px;
     background: linear-gradient(180deg, rgba(255,252,246,0.97), rgba(255,247,238,0.98));
     box-shadow: 0 16px 34px rgba(112,81,46,0.14);
     backdrop-filter: blur(8px);
     overflow: hidden; z-index: 6;
+    resize: horizontal;
     opacity: 0; pointer-events: none;
     transform: translateX(calc(100% + 26px));
     transition: transform 0.28s ease, opacity 0.18s ease;
@@ -185,9 +211,59 @@
     font-size: 11px; cursor: pointer;
   }
   .overlay-btn:hover { border-color: var(--accent); }
-  .detail-shell { flex: 1; min-height: 0; display: grid; grid-template-rows: auto auto auto 1fr; gap: 12px; padding: 12px; overflow: auto; }
+  .detail-shell { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px; overflow: auto; }
   .detail-card { border: 1px solid rgba(219,197,168,0.9); border-radius: 10px; background: rgba(255,252,247,0.96); padding: 12px; overflow: hidden; }
   .detail-card h4 { margin-bottom: 10px; font-size: 13px; color: #774620; }
+  .detail-radar {
+    width: 100%;
+    height: 320px;
+  }
+  .detail-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .detail-compare-grid.has-two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .detail-compare-grid.has-three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .detail-card-compact .product-name { font-size: 16px; }
+  .detail-card-compact .product-score { min-width: 84px; }
+  .detail-card-compact .score-value { font-size: 24px; }
+  .detail-card-compact .metric-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 6px 10px; }
+  .detail-card-compact .metric-row { padding: 5px 0; }
+  .detail-card-compact .bar-metric { grid-template-columns: 56px 1fr 30px; margin-top: 4px; }
+  .detail-radar-compare {
+    width: 100%;
+    height: clamp(280px, 34vh, 420px);
+  }
+  .detail-product-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .detail-product-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 10px;
+    align-items: start;
+  }
+  .detail-panel-section {
+    border: 1px solid rgba(219,197,168,0.82);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.68);
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .detail-panel-section h4 {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .detail-product-panel .product-sub {
+    line-height: 1.35;
+  }
+  .detail-radar-card {
+    flex-shrink: 0;
+  }
   .product-head { display: flex; justify-content: space-between; gap: 12px; }
   .product-name { font-size: 18px; line-height: 1.25; font-weight: 700; color: #623817; }
   .product-sub { margin-top: 6px; color: var(--muted); font-size: 12px; }
@@ -210,12 +286,117 @@
   .explain-item { padding: 10px 12px; border-left: 3px solid #d38d47; border-radius: 0 8px 8px 0; background: rgba(253,244,232,0.92); color: var(--text); }
   .table-wrap { padding: 10px 12px 12px; height: 100%; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
   .table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; }
-  .table-toolbar-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .table-toolbar-right { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .table-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 260px;
+    padding: 6px 10px;
+    border: 1px solid rgba(210,187,155,0.95);
+    border-radius: 999px;
+    background: rgba(255,252,246,0.96);
+  }
+  .table-search input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+  }
+  .compare-summary {
+    border: 1px dashed rgba(214,191,156,0.95);
+    border-radius: 12px;
+    background: rgba(255,250,243,0.9);
+    padding: 10px 12px;
+    scroll-margin-top: 16px;
+  }
+  .compare-summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .compare-empty {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .compare-card {
+    border: 1px solid rgba(219,197,168,0.9);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.78);
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .compare-card:hover {
+    border-color: rgba(203,165,119,0.92);
+    box-shadow: 0 4px 12px rgba(114,79,37,0.08);
+  }
+  .compare-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .compare-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6f4421;
+    line-height: 1.4;
+  }
+  .compare-remove {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 1px solid rgba(210,187,155,0.95);
+    background: rgba(255,252,246,0.96);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .compare-remove:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+  .compare-sub {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .compare-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    margin-top: 10px;
+  }
+  .compare-metric {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .compare-metric strong {
+    color: var(--text);
+    font-weight: 700;
+  }
   .table-scroller { flex: 1; min-height: 0; overflow: auto; border-radius: 10px; }
   .product-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; background: rgba(255,252,246,0.96); border: 1px solid rgba(219,197,168,0.9); border-radius: 10px; overflow: hidden; }
   .product-table thead th { position: sticky; top: 0; z-index: 1; padding: 10px 8px; background: linear-gradient(180deg,#fbefd9,#f5e3c7); color: #76451f; border-bottom: 1px solid rgba(219,197,168,0.9); font-weight: 700; }
   .product-table tbody td { padding: 9px 8px; border-bottom: 1px solid rgba(236,222,204,0.95); color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .product-table tbody tr:nth-child(odd) { background: rgba(255,250,243,0.95); }
+  .product-table tbody tr.is-selected { background: rgba(243,211,175,0.55); }
+  .product-table tbody tr.is-compared { box-shadow: inset 3px 0 0 #d98944; }
+  .table-check-cell { text-align: center; }
+  .table-check-input { width: 14px; height: 14px; accent-color: #d98944; cursor: pointer; }
   .badge-cell { display: inline-flex; align-items: center; justify-content: center; padding: 2px 6px; border-radius: 999px; border: 1px solid rgba(209,182,145,0.9); background: #fff; color: var(--muted); font-size: 11px; }
   .status-good { color: #577a44; border-color: rgba(125,164,100,0.55); background: #edf5e6; }
   .status-warn { color: #9b6425; border-color: rgba(214,146,69,0.52); background: #fff2df; }
@@ -223,21 +404,28 @@
   .panel-note { padding: 0 12px 10px; color: var(--muted); font-size: 11px; }
   @media (max-width: 1360px) {
     .row-major, .row-minor { grid-template-columns: 1fr; }
-    .mini-stack { grid-template-rows: repeat(2, minmax(220px,1fr)); }
     .panel-map { min-height: 1080px; }
     .map-stage { display: flex; flex-direction: column; gap: 12px; }
     .map-canvas { height: 620px; min-height: 620px; }
-    .detail-overlay { position: static; width: auto; margin: 0; opacity: 1; pointer-events: auto; transform: none; }
+    .detail-overlay { position: static; width: auto; min-width: 0; max-width: none; margin: 0; opacity: 1; pointer-events: auto; transform: none; resize: none; }
     .detail-overlay-toggle { display: none; }
     .controls-wrap { grid-template-columns: 1fr; }
     .control-block { grid-template-columns: repeat(2, minmax(0,1fr)); }
     .control-actions { justify-content: center; }
     .kpi-block { grid-template-columns: repeat(5, minmax(0,1fr)); }
+    .detail-compare-grid.has-three { grid-template-columns: repeat(2, minmax(0,1fr)); }
   }
   @media (max-width: 900px) {
     .panel-map { min-height: 960px; }
     .map-canvas { height: 520px; min-height: 520px; }
     .kpi-block { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .table-toolbar { flex-direction: column; align-items: stretch; }
+    .table-toolbar-right { justify-content: flex-start; }
+    .table-search { min-width: 0; width: 100%; }
+    .detail-compare-grid,
+    .detail-compare-grid.has-two,
+    .detail-compare-grid.has-three { grid-template-columns: 1fr; }
+    .detail-card-compact .metric-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -257,7 +445,7 @@
     <section class="panel panel-controls">
       <div class="panel-title">
         <div class="panel-title-main"><span class="panel-index">1</span><h3>全局控制台与指标总览</h3></div>
-        <div class="panel-meta">数据均为 mock，用于原型评审</div>
+        <div class="panel-meta">当前接入预处理后的真实后端数据</div>
       </div>
       <div class="panel-body">
         <div class="controls-wrap">
@@ -266,9 +454,8 @@
             <div class="control-item"><label>品类</label><select id="categorySelect"><option value="">全部品类</option></select></div>
             <div class="control-item"><label>主指标</label><select id="metricSelect">
               <option value="health_score">健康评分</option><option value="sugars">糖含量</option><option value="salt">盐含量</option>
-              <option value="fat">脂肪</option><option value="energy">能量</option><option value="nutriscore">Nutri-Score</option><option value="nova">NOVA等级</option>
+              <option value="fat">脂肪</option><option value="energy">能量</option><option value="price">价格</option><option value="nutriscore">Nutri-Score</option><option value="nova">NOVA等级</option>
             </select></div>
-            <div class="control-item"><label>币种</label><select id="currencySelect"><option value="">全部币种</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="CHF">CHF</option><option value="CAD">CAD</option></select></div>
             <div class="control-item"><label>品牌</label><div class="control-input"><input id="brandInput" placeholder="输入品牌名搜索..." style="border:none;outline:none;width:100%;font-size:13px;color:var(--text);background:transparent;"><span>⌕</span></div></div>
             <div class="control-item"><label>异常阈值</label><select id="anomalyThresh">
               <option value="0" selected>不筛选</option><option value="1.0">&gt; 1.0</option><option value="1.5">&gt; 1.5</option>
@@ -293,13 +480,13 @@
         </div>
         <div class="control-actions">
           <button class="ghost-btn" id="saveFilterBtn" type="button">保存筛选</button>
-          <button class="ghost-btn" id="compareBtn" type="button">切换对比</button>
+          <button class="ghost-btn" id="compareBtn" type="button">产品对比</button>
           <button class="solid-btn" id="resetBtn">重置视图</button>
         </div>
       </div>
     </section>
 
-    <!-- ====== 2: 全球地图总览 (内含 9: 单产品解释悬浮层) ====== -->
+    <!-- ====== 2: 全球地图总览 (内含 9: 产品解释悬浮层) ====== -->
     <section class="panel panel-map">
       <div class="panel-title">
         <div class="panel-title-main"><span class="panel-index">2</span><h3>全球地图总览</h3></div>
@@ -313,12 +500,12 @@
             <button id="detailDrawerToggle" class="detail-overlay-toggle" type="button" aria-expanded="false">产品详情</button>
             <aside id="detailOverlay" class="detail-overlay" aria-hidden="true">
               <div class="detail-overlay-head">
-                <div class="detail-overlay-title"><span class="panel-index">9</span><h4>单产品解释</h4></div>
+                <div class="detail-overlay-title"><span class="panel-index">9</span><h4>产品解释</h4></div>
                 <button id="detailDrawerClose" class="overlay-btn" type="button">收起</button>
               </div>
               <div class="detail-shell" id="detailShell">
                 <div class="detail-card" style="text-align:center;padding:40px;color:var(--muted);">
-                  点击地图中的国家，再通过散点图选择产品查看详情
+                  点击散点、排行点或表格行查看产品解释，也可在对比区中选择最多 3 个产品。
                 </div>
               </div>
             </aside>
@@ -357,33 +544,69 @@
       </section>
     </div>
 
-    <!-- ====== 5 & 6 & 7: 平行坐标 + 热力图 + 箱线图 ====== -->
+    <!-- ====== 5 & 7: 同类定位排行图 + 箱线图 ====== -->
     <div class="row-minor">
-      <section class="panel panel-parallel">
+      <section class="panel panel-price-relation">
         <div class="panel-title">
-          <div class="panel-title-main"><span class="panel-index">5</span><h3>营养结构平行坐标图</h3></div>
-          <div class="chip-row"><span class="chip">糖</span><span class="chip">盐</span><span class="chip">脂肪</span><span class="chip">能量</span><span class="chip">健康</span><span class="chip">价格</span><span class="chip">异常</span><span class="chip">完整度</span></div>
+          <div class="panel-title-main"><span class="panel-index">5</span><h3>同类定位排行图</h3></div>
+          <div class="chip-row">
+            <select id="peerMetricSelect" class="header-inline-select">
+              <option value="price" selected>按价格定位</option>
+              <option value="health">按健康评分定位</option>
+              <option value="nutriscore_num">按Nutri-Score定位</option>
+              <option value="nova">按NOVA定位</option>
+              <option value="sugars">按糖含量定位</option>
+              <option value="salt">按盐含量定位</option>
+              <option value="fat">按脂肪定位</option>
+              <option value="energy">按能量定位</option>
+              <option value="completeness">按完整度定位</option>
+              <option value="anomaly">按异常度定位</option>
+            </select>
+            <span class="chip">同国家 / 同品类</span>
+          </div>
         </div>
-        <div class="panel-body"><div id="chartParallel" class="chart"></div></div>
+        <div class="panel-body"><div id="chartPeerRank" class="chart"></div></div>
       </section>
 
-      <div class="mini-stack">
-        <section class="panel panel-heatmap">
-          <div class="panel-title">
-            <div class="panel-title-main"><span class="panel-index">6</span><h3>国家 × 品类矩阵热力图</h3></div>
-            <div class="chip-row"><span class="chip">价格-营养性价比</span></div>
+      <section class="panel panel-boxplot">
+        <div class="panel-title">
+          <div class="panel-title-main"><span class="panel-index">7</span><h3>价格分布箱线图</h3></div>
+          <div class="chip-row">
+            <select id="boxplotCategorySelect" class="header-inline-select">
+              <option value="">跟随全局品类</option>
+            </select>
+            <span class="chip">By Country</span>
           </div>
-          <div class="panel-body"><div id="chartHeatmap" class="chart"></div></div>
-        </section>
+        </div>
+        <div class="panel-body"><div id="chartBoxplot" class="chart"></div></div>
+      </section>
+    </div>
 
-        <section class="panel panel-boxplot">
-          <div class="panel-title">
-            <div class="panel-title-main"><span class="panel-index">7</span><h3>价格分布箱线图</h3></div>
-            <div class="chip-row"><span class="chip">Sweet snacks</span><span class="chip">By Country</span></div>
+    <!-- ====== 6: 品牌定位气泡图 ====== -->
+    <div class="row-brand">
+      <section class="panel panel-heatmap">
+        <div class="panel-title">
+          <div class="panel-title-main"><span class="panel-index">6</span><h3>品牌定位气泡图</h3></div>
+          <div class="chip-row">
+              X <select id="brandBubbleX" style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--text);">
+                <option value="health" selected>健康</option><option value="sugars">糖</option><option value="salt">盐</option>
+                <option value="fat">脂肪</option><option value="energy">能量</option><option value="completeness">完整度</option>
+                <option value="nutriscore_num">Nutri-Score</option><option value="nova">NOVA</option><option value="anomaly">异常</option>
+              </select>
+              Y <select id="brandBubbleY" style="font-size:11px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--text);">
+                <option value="price" selected>均价</option><option value="health">健康</option><option value="sugars">糖</option><option value="salt">盐</option>
+                <option value="fat">脂肪</option><option value="energy">能量</option><option value="completeness">完整度</option>
+                <option value="nutriscore_num">Nutri-Score</option><option value="nova">NOVA</option><option value="anomaly">异常</option>
+              </select>
+            <select id="brandBubbleMinProducts" class="header-inline-select" style="min-width:92px;">
+              <option value="5">样本≥5</option>
+              <option value="10" selected>样本≥10</option>
+              <option value="20">样本≥20</option>
+            </select>
           </div>
-          <div class="panel-body"><div id="chartBoxplot" class="chart"></div></div>
-        </section>
-      </div>
+        </div>
+        <div class="panel-body"><div id="chartHeatmap" class="chart"></div></div>
+      </section>
     </div>
 
     <!-- ====== 8: 产品列表 ====== -->
@@ -402,6 +625,10 @@
           <div class="table-toolbar">
             <div id="tableFilterLabel">当前筛选：全部 / 全部 / 异常度降序</div>
             <div class="table-toolbar-right">
+              <div class="table-search">
+                <span>⌕</span>
+                <input id="tableSearchInput" type="text" placeholder="搜索产品名或品牌名">
+              </div>
               <div class="chip-row" id="tableSortChips">
                 <span class="chip" data-sort="price">价格 ▾</span>
                 <span class="chip" data-sort="health">健康</span>
@@ -410,11 +637,21 @@
               </div>
             </div>
           </div>
+          <div class="compare-summary" id="compareSummary">
+            <div class="compare-summary-head">
+              <div>
+                <strong>对比区</strong>
+                <span class="panel-meta">最多选择 3 个产品并列查看</span>
+              </div>
+              <button class="ghost-btn panel-chip-btn" id="clearCompareBtn" type="button">清空对比</button>
+            </div>
+            <div id="compareSummaryBody" class="compare-empty">尚未选择对比产品</div>
+          </div>
           <div class="table-scroller">
             <table class="product-table">
               <thead>
                 <tr>
-                  <th style="width:15%">产品</th><th style="width:10%">品牌</th><th style="width:10%">国家</th>
+                  <th style="width:5%">对比</th><th style="width:15%">产品</th><th style="width:10%">品牌</th><th style="width:10%">国家</th>
                   <th style="width:12%">品类</th><th style="width:8%">价格</th><th style="width:8%">健康分</th>
                   <th style="width:8%">异常度</th><th style="width:7%">NOVA</th>
                   <th style="width:8%">糖</th><th style="width:7%">完整度</th><th style="width:7%">状态</th>
@@ -430,73 +667,276 @@
 </div>
 
 <script>
-// ========== Mock 数据 ==========
-const COUNTRIES = [
-  { zh:'法国',en:'France',samples:160329,health:0.61,sugars:19.3,salt:0.80,fat:13.2,energy:295,price:2.81,anomaly:1.39,priceCov:0.22},
-  { zh:'美国',en:'United States',samples:102375,health:0.46,sugars:27.5,salt:1.06,fat:16.4,energy:360,price:3.48,anomaly:1.73,priceCov:0.18},
-  { zh:'德国',en:'Germany',samples:49152,health:0.58,sugars:20.1,salt:0.90,fat:13.8,energy:310,price:2.54,anomaly:1.22,priceCov:0.24},
-  { zh:'西班牙',en:'Spain',samples:19606,health:0.64,sugars:17.8,salt:0.77,fat:14.5,energy:325,price:2.22,anomaly:1.16,priceCov:0.28},
-  { zh:'英国',en:'United Kingdom',samples:17782,health:0.53,sugars:24.2,salt:0.94,fat:14.0,energy:330,price:3.16,anomaly:1.41,priceCov:0.15},
-  { zh:'意大利',en:'Italy',samples:14278,health:0.67,sugars:16.5,salt:0.73,fat:12.0,energy:280,price:2.38,anomaly:1.05,priceCov:0.30},
-  { zh:'比利时',en:'Belgium',samples:14855,health:0.56,sugars:20.8,salt:0.86,fat:13.5,energy:305,price:2.67,anomaly:1.28,priceCov:0.20},
-  { zh:'加拿大',en:'Canada',samples:7994,health:0.51,sugars:25.1,salt:0.96,fat:14.9,energy:340,price:3.34,anomaly:1.47,priceCov:0.16},
-  { zh:'荷兰',en:'Netherlands',samples:7172,health:0.55,sugars:21.4,salt:0.88,fat:14.0,energy:315,price:2.71,anomaly:1.25,priceCov:0.19},
-  { zh:'瑞士',en:'Switzerland',samples:6996,health:0.62,sugars:18.2,salt:0.75,fat:12.5,energy:290,price:3.68,anomaly:1.32,priceCov:0.14}
-];
-const CATEGORIES = [
-  { zh:'甜食',en:'Sweet snacks',samples:95739,health:0.36,sugars:38.2,salt:0.44,fat:18.8,energy:434,nova:3.7,nutriscore_num:2.3},
-  { zh:'植物基食品',en:'Plant-based foods',samples:88463,health:0.71,sugars:8.6,salt:0.67,fat:9.4,energy:281,nova:2.2,nutriscore_num:3.8},
-  { zh:'谷物与土豆',en:'Cereals & potatoes',samples:64422,health:0.55,sugars:12.1,salt:0.79,fat:10.8,energy:322,nova:2.8,nutriscore_num:3.2},
-  { zh:'甜点',en:'Desserts',samples:42494,health:0.33,sugars:31.7,salt:0.33,fat:8.5,energy:261,nova:3.5,nutriscore_num:2.1},
-  { zh:'饮料',en:'Beverages',samples:36704,health:0.43,sugars:22.6,salt:0.09,fat:1.4,energy:186,nova:3.2,nutriscore_num:2.8},
-  { zh:'零食',en:'Snacks',samples:33134,health:0.39,sugars:26.4,salt:1.31,fat:24.6,energy:477,nova:3.5,nutriscore_num:2.5},
-  { zh:'发酵乳制品',en:'Fermented milk',samples:26770,health:0.66,sugars:13.9,salt:0.29,fat:7.8,energy:218,nova:1.8,nutriscore_num:3.6},
-  { zh:'乳制品',en:'Dairies',samples:11077,health:0.60,sugars:10.6,salt:0.56,fat:15.1,energy:313,nova:2.4,nutriscore_num:3.0},
-  { zh:'植物基食品与饮料',en:'Plant-based foods & beverages',samples:1159,health:0.68,sugars:9.2,salt:0.55,fat:8.6,energy:260,nova:2.5,nutriscore_num:3.5},
-  { zh:'发酵食品',en:'Fermented foods',samples:577,health:0.63,sugars:11.5,salt:1.42,fat:10.2,energy:240,nova:2.0,nutriscore_num:3.3}
-];
-const CAT_COLORS = {
-  'Sweet snacks':'#d68849','Plant-based foods':'#7ca36b','Cereals & potatoes':'#c9a04e',
-  'Desserts':'#c97563','Beverages':'#7ea7bf','Snacks':'#8b74b2',
-  'Fermented milk':'#71a48f','Dairies':'#ad8c68',
-  'Plant-based foods & beverages':'#e8916a','Fermented foods':'#6ba3b5'
+// ========== Backend 数据 ==========
+const API_ENDPOINTS = {
+  bootstrap: '/api/bootstrap',
+  anomaly: '/api/products/anomaly',
+  price: '/api/products/price',
+  brandBubbles: '/api/brands/bubbles'
 };
+let COUNTRIES = [];
+let CATEGORIES = [];
+let PRODUCTS = [];
+let ANOMALY_PRODUCTS_BASE = [];
+let PRICE_PRODUCTS = [];
+let BRAND_BUBBLES = [];
+let COUNTRY_BY_EN = {};
+let CATEGORY_BY_EN = {};
+let TOTAL_PRODUCTS = 0;
+const PRICE_CURRENCY = 'EUR';
+const CAT_COLORS = {
+  'Sugary snacks':'#d68849','Appetizers':'#c97563','Salty snacks':'#8b74b2',
+  'Beverages':'#7ea7bf','Cereals & potatoes':'#c9a04e','Milk & dairy':'#71a48f',
+  'Fish, meat & eggs':'#ad8c68','Fruits & vegetables':'#7ca36b',
+  'Fats & sauces':'#e8916a','Composite foods':'#6ba3b5'
+};
+const ANOMALY_RANGE = { min:0.4, max:3.5 };
 
-// Seeded random
-function seededRandom(seed) { let v=seed%2147483647; if(v<=0) v+=2147483646; return ()=>{ v=v*16807%2147483647; return (v-1)/2147483646; }; }
-const rand=seededRandom(20260615);
-const MOCK_PRODUCTS=Array.from({length:500},(_,i)=>{
-  const country=COUNTRIES[i%10], category=CATEGORIES[Math.floor(i/50)%10];
-  const currMap={France:"EUR","United States":"USD",Germany:"EUR",Spain:"EUR","United Kingdom":"GBP",Italy:"EUR",Belgium:"EUR",Canada:"CAD",Netherlands:"EUR",Switzerland:"CHF"};
-  const currency=currMap[country.en]||"EUR";
-  const health=Math.max(0.18,Math.min(0.87,category.health+(rand()-0.5)*0.28+(country.health-0.55)*0.24));
-  const price=Math.max(0.65,country.price+(rand()-0.4)*2.2+(0.7-health)*1.7);
-  const sugars=Math.max(0.1,category.sugars+(rand()-0.5)*9.8);
-  const salt=Math.max(0.01,category.salt+(rand()-0.5)*0.65);
-  const fat=Math.max(0.1,category.fat+(rand()-0.5)*8.4);
-  const energy=Math.max(40,category.energy+(rand()-0.5)*110);
-  const completeness=Math.max(0.35,Math.min(0.94,0.58+(rand()-0.45)*0.35));
-  const anomaly=Math.max(0.4,Math.abs((0.65-health)*2.9+(price-country.price)*0.52+(rand()-0.25)));
-  const nova=Math.max(1,Math.min(4,Math.round(category.nova+(rand()-0.5)*1.4)));
-  const nutriNum=Math.max(1,Math.min(5,Math.round(5-(health*4.2))));
-  const nutri=['E','D','C','B','A'][nutriNum-1];
+function toNumberOrNull(value){
+  if(value==null || value==='') return null;
+  const num=Number(value);
+  return Number.isFinite(num)?num:null;
+}
+function clampOrNull(value, min, max){
+  const num=toNumberOrNull(value);
+  if(num==null) return null;
+  return Math.min(Math.max(num, min), max);
+}
+function formatPrice(value, currency){
+  const num=toNumberOrNull(value);
+  if(num==null) return '—';
+  return `€${num.toFixed(2)}`;
+}
+function getCountryMeanPrice(countryEn){
+  const prices=PRODUCTS.filter(item=>item.countryEn===countryEn && item.price!=null).map(item=>item.price);
+  if(!prices.length) return null;
+  return prices.reduce((sum,value)=>sum+value,0)/prices.length;
+}
+function rebuildProductIndexes(){
+  COUNTRY_BY_EN=Object.fromEntries(COUNTRIES.map(item=>[item.en,item]));
+  CATEGORY_BY_EN=Object.fromEntries(CATEGORIES.map(item=>[item.en,item]));
+}
+function quantile(values, q){
+  if(!values.length) return 0;
+  const sorted=values.slice().sort((a,b)=>a-b);
+  const pos=(sorted.length-1)*q;
+  const base=Math.floor(pos);
+  const rest=pos-base;
+  return sorted[base+1]!==undefined?sorted[base]+rest*(sorted[base+1]-sorted[base]):sorted[base];
+}
+function normalizeAnomalyProducts(products){
+  const rawValues=products.map(item=>toNumberOrNull(item.anomalyRaw)).filter(value=>value!=null && value>=0);
+  if(!rawValues.length){
+    products.forEach(item=>{item.anomaly=ANOMALY_RANGE.min;});
+    return;
+  }
+  const cap=quantile(rawValues,0.98);
+  const floor=quantile(rawValues,0.05);
+  const low=Math.log1p(floor);
+  const high=Math.max(low+1e-6,Math.log1p(cap));
+  products.forEach(item=>{
+    const raw=toNumberOrNull(item.anomalyRaw) ?? floor;
+    const clamped=Math.min(Math.max(raw,floor),cap);
+    const scaled=(Math.log1p(clamped)-low)/(high-low);
+    const value=ANOMALY_RANGE.min+scaled*(ANOMALY_RANGE.max-ANOMALY_RANGE.min);
+    item.anomaly=Number(Math.max(ANOMALY_RANGE.min,Math.min(ANOMALY_RANGE.max,value)).toFixed(2));
+  });
+}
+function deriveDisplayFlag(item){
+  const anomaly=toNumberOrNull(item.anomaly);
+  const health=toNumberOrNull(item.health);
+  const completeness=toNumberOrNull(item.completeness);
+  const nutri=(item.nutriscore || '').toUpperCase();
+
+  if(
+    (anomaly!=null && anomaly >= 3.0)
+    || ((health ?? 1) < 0.30 && (completeness ?? 1) < 0.50)
+    || nutri === 'E'
+  ){
+    return 'high';
+  }
+  if(
+    (anomaly!=null && anomaly >= 2.15)
+    || ((health ?? 1) < 0.45)
+    || ((completeness ?? 1) < 0.58)
+    || nutri === 'D'
+  ){
+    return 'warn';
+  }
+  return 'good';
+}
+function getStatusMeta(item){
+  const flag=item.displayFlag || deriveDisplayFlag(item);
+  if(flag==='high') return {flag, text:'异常', chipClass:'status-bad', pillClass:'flag-red'};
+  if(flag==='warn') return {flag, text:'关注', chipClass:'status-warn', pillClass:'flag-orange'};
+  return {flag:'good', text:'健康', chipClass:'status-good', pillClass:'flag-green'};
+}
+function getTableSortValue(item, field){
+  if(field==='health'){
+    const health=toNumberOrNull(item.health) ?? 0;
+    const completeness=toNumberOrNull(item.completeness) ?? 0;
+    const anomaly=toNumberOrNull(item.anomaly) ?? ANOMALY_RANGE.min;
+    const nutri=toNumberOrNull(item.nutriscore_num) ?? 0;
+    return health * 1000 + completeness * 120 - anomaly * 35 + nutri * 8;
+  }
+  return toNumberOrNull(item[field]) ?? 0;
+}
+function anomalyToSymbolSize(anomaly){
+  const value=toNumberOrNull(anomaly);
+  if(value==null) return 6;
+  const ratio=(value-ANOMALY_RANGE.min)/(ANOMALY_RANGE.max-ANOMALY_RANGE.min);
+  const clamped=Math.max(0,Math.min(1,ratio));
+  return Number((6+Math.sqrt(clamped)*12).toFixed(2));
+}
+function mapCountryRecord(item){
   return {
-    id:i,name:`Product ${i+1}`,brand:['Maison Lune','Nutri Forge','Daily Grain','Urban Root','Pure Mill','Casa Verde','Nordico','Fresh Vale'][i%8],
-    countryEn:country.en,countryZh:country.zh,categoryEn:category.en,categoryZh:category.zh,
-    price:rand()>0.1?Number(price.toFixed(2)):null,health:Number(health.toFixed(2)),
-    sugars:Number(sugars.toFixed(1)),salt:Number(salt.toFixed(2)),fat:Number(fat.toFixed(1)),
-    energy:Number(energy.toFixed(0)),completeness:Number(completeness.toFixed(2)),
-    anomaly:Number(anomaly.toFixed(2)),nova,nutriscore:nutri,nutriscore_num:nutriNum,
-    flag:anomaly>2.25?'high':anomaly>1.45?'warn':'good',currency
+    zh:item.name,en:item.enName,samples:item.samples,
+    health:toNumberOrNull(item.health) ?? 0,
+    sugars:toNumberOrNull(item.sugars) ?? 0,
+    salt:toNumberOrNull(item.salt) ?? 0,
+    fat:toNumberOrNull(item.fat) ?? 0,
+    energy:toNumberOrNull(item.energy) ?? 0,
+    nutriscore:toNumberOrNull(item.nutriscore) ?? 0,
+    nova:toNumberOrNull(item.nova) ?? 0,
+    anomaly:toNumberOrNull(item.anomaly) ?? 0,
+    price:toNumberOrNull(item.price),
+    priceCov:(toNumberOrNull(item.priceCov) ?? 0) / 100,
+    priceRecordCount:item.priceRecordCount || 0
   };
-});
+}
+function mapCategoryRecord(item){
+  return {
+    zh:item.name,en:item.enName,parent:item.parent || '',samples:item.samples,
+    health:toNumberOrNull(item.health) ?? 0,
+    sugars:toNumberOrNull(item.sugars) ?? 0,
+    salt:toNumberOrNull(item.salt) ?? 0,
+    fat:toNumberOrNull(item.fat) ?? 0,
+    energy:toNumberOrNull(item.energy) ?? 0,
+    nutriscore:toNumberOrNull(item.nutriscore) ?? 0,
+    nova:toNumberOrNull(item.nova) ?? 0,
+    anomaly:toNumberOrNull(item.anomaly) ?? 0,
+    priceCov:(toNumberOrNull(item.priceCov) ?? 0) / 100
+  };
+}
+function mapProductRecord(item){
+  return {
+    id:String(item.id),
+    name:item.name || String(item.id),
+    brand:item.brand || 'Unknown',
+    countryEn:item.country,
+    countryZh:item.countryLabel,
+    categoryEn:item.category,
+    categoryZh:item.categoryLabel,
+    price:clampOrNull(item.price, 0, 100),
+    health:clampOrNull(item.health, 0, 1),
+    sugars:clampOrNull(item.sugars, 0, 100),
+    salt:clampOrNull(item.salt, 0, 10),
+    fat:clampOrNull(item.fat, 0, 100),
+    energy:clampOrNull(item.energy, 0, 1500),
+    completeness:clampOrNull(item.completeness, 0, 1),
+    anomalyRaw:toNumberOrNull(item.anomaly) ?? 0,
+    anomaly:0,
+    nova:clampOrNull(item.nova, 1, 4),
+    nutriscore:item.nutriscore || null,
+    nutriscore_num:clampOrNull(item.nutriscore_num, 1, 5),
+    flag:item.flag || 'good',
+    displayFlag:'good',
+    priceRecordCount:item.priceRecordCount || 0,
+    qualityWarnings:item.qualityWarnings || 0,
+    qualityErrors:item.qualityErrors || 0
+  };
+}
+function mergeProductPayloads(...payloads){
+  const merged=new Map();
+  payloads.flat().forEach(raw=>{
+    const next=mapProductRecord(raw);
+    const prev=merged.get(next.id);
+    merged.set(next.id, prev ? { ...prev, ...next } : next);
+  });
+  const products=Array.from(merged.values());
+  normalizeAnomalyProducts(products);
+  products.forEach(item=>{
+    item.displayFlag=deriveDisplayFlag(item);
+  });
+  return products;
+}
+function syncProducts(){
+  PRODUCTS=mergeProductPayloads(ANOMALY_PRODUCTS_BASE, PRICE_PRODUCTS);
+}
+async function fetchJson(url){
+  const response=await fetch(url);
+  if(!response.ok) throw new Error(`Request failed: ${response.status} ${url}`);
+  return response.json();
+}
+function buildScopedQuery(limit, extraParams={}){
+  const params=new URLSearchParams();
+  params.set('limit', String(limit));
+  if(selectedCountry) params.set('country', selectedCountry);
+  if(selectedCategory) params.set('category', selectedCategory);
+  Object.entries(extraParams).forEach(([key, value])=>{
+    if(value!=null && value!=='') params.set(key, String(value));
+  });
+  return params.toString();
+}
+function getScopedSampleLimit(){
+  if(selectedCountry && selectedCategory) return 3200;
+  if(selectedCountry || selectedCategory) return 3600;
+  return 4000;
+}
+async function loadPriceData(){
+  const payload=await fetchJson(`${API_ENDPOINTS.price}?${buildScopedQuery(getScopedSampleLimit())}`);
+  PRICE_PRODUCTS=payload.products || [];
+  syncProducts();
+  return payload;
+}
+async function loadBrandBubbleData(){
+  const params=new URLSearchParams();
+  if(selectedCountry) params.set('country', selectedCountry);
+  if(selectedCategory) params.set('category', selectedCategory);
+  if(selectedBrand) params.set('brand', selectedBrand);
+  params.set('x_metric', brandBubbleX);
+  params.set('y_metric', brandBubbleY);
+  params.set('min_products', String(brandMinProducts));
+  params.set('priced_min', '3');
+  params.set('multi_category_min', selectedCategory ? '1' : '2');
+  params.set('limit', selectedCountry || selectedCategory ? '160' : '120');
+  const payload=await fetchJson(`${API_ENDPOINTS.brandBubbles}?${params.toString()}`);
+  BRAND_BUBBLES=payload.brands || [];
+  return payload;
+}
+async function loadScopedProducts(){
+  const anomalyPayload=await fetchJson(`${API_ENDPOINTS.anomaly}?${buildScopedQuery(getScopedSampleLimit())}`);
+  ANOMALY_PRODUCTS_BASE=anomalyPayload.products || [];
+  const pricePayload=await loadPriceData();
+  const brandPayload=await loadBrandBubbleData();
+  return { anomalyPayload, pricePayload, brandPayload };
+}
+async function loadBackendData(){
+  const bootstrap=await fetchJson(API_ENDPOINTS.bootstrap);
+  COUNTRIES=(bootstrap.countries || []).map(mapCountryRecord);
+  CATEGORIES=(bootstrap.categories || []).map(mapCategoryRecord);
+  rebuildProductIndexes();
+  TOTAL_PRODUCTS=bootstrap.totalProducts || 0;
+  await loadScopedProducts();
+}
 
 // ========== 全局状态 ==========
-let selectedCountry='',selectedCategory='',currentMetric='health_score',mapZoomedTo=null,selectedCurrency='';
+let selectedCountry='',selectedCategory='',currentMetric='health_score',mapZoomedTo=null;
 let selectedBrand='',anomalyThreshold=0,completenessThreshold=0,priceRange='';
+let selectedProductId=null,tableSearchTerm='',boxplotCategoryOverride='';
+let comparedProductIds=[];
+let anomalyLegendSelection={};
+let brandBubbleX='health',brandBubbleY='price',brandMinProducts=10;
+const MAX_COMPARE_PRODUCTS=3;
+const DATA_CACHE={
+  filtered:{key:'',value:[]},
+  sunburst:{key:'',value:[]},
+  countryStats:new Map(),
+  boxplot:new Map()
+};
 
 // 统一过滤函数：应用所有筛选条件
-function filterProducts(data){
+function applyProductFilters(data,{includeSearch=true}={}){
   if(selectedCountry) data=data.filter(d=>d.countryEn===selectedCountry);
   if(selectedCategory) data=data.filter(d=>d.categoryEn===selectedCategory);
   if(selectedBrand) data=data.filter(d=>d.brand.toLowerCase().includes(selectedBrand.toLowerCase()));
@@ -504,10 +944,31 @@ function filterProducts(data){
   if(completenessThreshold>0) data=data.filter(d=>d.completeness>=completenessThreshold);
   if(priceRange){
     const [lo,hi]=priceRange.split(',').map(Number);
-    data=data.filter(d=>d.price>=lo&&d.price<=hi);
+    data=data.filter(d=>d.price!=null && d.price>=lo&&d.price<=hi);
   }
-  if(selectedCurrency) data=data.filter(d=>d.currency===selectedCurrency);
+  if(includeSearch && tableSearchTerm){
+    const query=tableSearchTerm.toLowerCase();
+    data=data.filter(d=>d.name.toLowerCase().includes(query)||d.brand.toLowerCase().includes(query));
+  }
   return data;
+}
+function filterProducts(data){
+  return applyProductFilters(data,{includeSearch:true});
+}
+function buildFilterCacheKey(includeSearch=true){
+  return JSON.stringify({
+    selectedCountry,
+    selectedCategory,
+    selectedBrand:selectedBrand.toLowerCase(),
+    anomalyThreshold,
+    completenessThreshold,
+    priceRange,
+    tableSearchTerm:includeSearch?tableSearchTerm.toLowerCase():''
+  });
+}
+function clearDerivedCaches(){
+  DATA_CACHE.countryStats.clear();
+  DATA_CACHE.boxplot.clear();
 }
 const COUNTRY_CENTERS={
   'France':[2.75,46.85],'United States':[-89.55,37.77],'Germany':[11.29,50.45],
@@ -517,21 +978,297 @@ const COUNTRY_CENTERS={
 const AXIS_META={
   sugars:{label:'糖含量 (g/100g)',unit:'g'},salt:{label:'盐含量 (g/100g)',unit:'g'},
   fat:{label:'脂肪 (g/100g)',unit:'g'},health:{label:'健康评分',unit:''},
-  price:{label:'中位价格 (€)',unit:'€'},completeness:{label:'数据完整度',unit:''},
+  price:{label:'中位价格',unit:''},completeness:{label:'数据完整度',unit:''},
   nutriscore_num:{label:'Nutri-Score',unit:''},nova:{label:'NOVA等级',unit:''},
   energy:{label:'能量 (kcal)',unit:'kcal'}
 };
+function getAxisMeta(axisKey){
+  if(axisKey==='price'){
+    return {label:'中位价格 (€)',unit:'€'};
+  }
+  if(axisKey==='anomaly'){
+    return {label:'异常度',unit:''};
+  }
+  return AXIS_META[axisKey] || { label: axisKey, unit: '' };
+}
+function formatMetricValue(metricKey, value, metricMeta){
+  const numeric=toNumberOrNull(value);
+  if(numeric==null) return '-';
+  if(metricKey==='price') return formatPrice(numeric, 'EUR');
+  const suffix=metricMeta?.unit ? ` ${metricMeta.unit}` : '';
+  return `${numeric.toFixed(2)}${suffix}`;
+}
+
+function getCurrentMetricKey(){
+  return currentMetric==='health_score'
+    ? 'health'
+    : currentMetric==='nutriscore'
+      ? 'nutriscore'
+      : currentMetric;
+}
+
+function getCountryMetricValue(countryEn, metricKey){
+  const items=getFilteredProducts().filter(item=>item.countryEn===countryEn);
+  if(!items.length) return null;
+  const values=items
+    .map(item=>toNumberOrNull(item[metricKey]))
+    .filter(value=>value!=null);
+  if(!values.length) return null;
+  return values.reduce((sum,value)=>sum+value,0)/values.length;
+}
+
+function buildCountryMetricMap(metricKey, products){
+  const grouped=new Map();
+  products.forEach(item=>{
+    const country=item.countryEn;
+    const value=toNumberOrNull(item[metricKey]);
+    if(!country || value==null) return;
+    const existing=grouped.get(country) || { sum:0, count:0 };
+    existing.sum+=value;
+    existing.count+=1;
+    grouped.set(country, existing);
+  });
+  return new Map(
+    COUNTRIES.map(country=>{
+      const stat=grouped.get(country.en);
+      return [country.en, stat && stat.count ? stat.sum / stat.count : null];
+    })
+  );
+}
+
+function buildCountryStats(metricKey, products){
+  const cacheKey=`${metricKey}|${buildFilterCacheKey(true)}`;
+  const cached=DATA_CACHE.countryStats.get(cacheKey);
+  if(cached) return cached;
+  const grouped=new Map();
+  products.forEach(item=>{
+    const country=item.countryEn;
+    if(!country) return;
+    const existing=grouped.get(country) || { samples:0, metricSum:0, metricCount:0, priceSum:0, priceCount:0 };
+    existing.samples+=1;
+    const metricValue=toNumberOrNull(item[metricKey]);
+    if(metricValue!=null){
+      existing.metricSum+=metricValue;
+      existing.metricCount+=1;
+    }
+    const priceValue=toNumberOrNull(item.price);
+    if(priceValue!=null){
+      existing.priceSum+=priceValue;
+      existing.priceCount+=1;
+    }
+    grouped.set(country, existing);
+  });
+  const statsMap=new Map(
+    COUNTRIES.map(country=>{
+      const stat=grouped.get(country.en);
+      return [country.en, {
+        samples: stat?.samples || 0,
+        metricMean: stat && stat.metricCount ? stat.metricSum / stat.metricCount : null,
+        priceMean: stat && stat.priceCount ? stat.priceSum / stat.priceCount : null
+      }];
+    })
+  );
+  DATA_CACHE.countryStats.set(cacheKey, statsMap);
+  return statsMap;
+}
+
+function getBoxplotValuesByCountry(focusCategory){
+  const cacheKey=`${focusCategory}|${buildFilterCacheKey(true)}`;
+  const cached=DATA_CACHE.boxplot.get(cacheKey);
+  if(cached) return cached;
+  const grouped=new Map(COUNTRIES.map(country=>[country.en, []]));
+  getFilteredProducts().forEach(item=>{
+    if(item.categoryEn!==focusCategory || item.price==null) return;
+    const arr=grouped.get(item.countryEn);
+    if(arr) arr.push(item.price);
+  });
+  DATA_CACHE.boxplot.set(cacheKey, grouped);
+  return grouped;
+}
 
 function getMetricLabel(){
-  const m={health_score:'健康评分',sugars:'糖含量',salt:'盐含量',fat:'脂肪',energy:'能量',nutriscore:'Nutri-Score',nova:'NOVA等级'};
+  const m={health_score:'健康评分',sugars:'糖含量',salt:'盐含量',fat:'脂肪',energy:'能量',price:'价格',nutriscore:'Nutri-Score',nova:'NOVA等级'};
   return m[currentMetric]||currentMetric;
+}
+function getFilteredProducts(){
+  const key=buildFilterCacheKey(true);
+  if(DATA_CACHE.filtered.key===key) return DATA_CACHE.filtered.value;
+  const value=applyProductFilters(PRODUCTS.slice(),{includeSearch:true});
+  DATA_CACHE.filtered={key,value};
+  clearDerivedCaches();
+  return value;
+}
+function getSunburstProducts(){
+  const key=buildFilterCacheKey(false);
+  if(DATA_CACHE.sunburst.key===key) return DATA_CACHE.sunburst.value;
+  const value=applyProductFilters(PRODUCTS.slice(),{includeSearch:false});
+  DATA_CACHE.sunburst={key,value};
+  return value;
+}
+function getSelectedProduct(){
+  return selectedProductId==null?null:(PRODUCTS.find(item=>item.id===selectedProductId)||null);
+}
+function getActiveAnomalyCategorySet(){
+  if(selectedCategory) return new Set([selectedCategory]);
+  return new Set(
+    CATEGORIES
+      .filter(item=>anomalyLegendSelection[item.en] !== false)
+      .map(item=>item.en)
+  );
+}
+
+function getVisibleBrandBubbles(){
+  const activeCategories=getActiveAnomalyCategorySet();
+  if(!activeCategories.size) return [];
+  return BRAND_BUBBLES.filter(item=>activeCategories.has(item.dominantCategory));
+}
+function getPeerProducts(product){
+  let peers=PRODUCTS.filter(item=>item.categoryEn===product.categoryEn);
+  if(product.countryEn){
+    const sameCountry=peers.filter(item=>item.countryEn===product.countryEn);
+    if(sameCountry.length) return sameCountry;
+  }
+  return peers;
+}
+function hasMetricValue(item, metricKey){
+  const value=item?.[metricKey];
+  return value!=null && Number.isFinite(value);
+}
+function getPeerScopeInfo(product){
+  if(product){
+    const sameCategory=PRODUCTS.filter(item=>item.categoryEn===product.categoryEn);
+    const sameCountry=product.countryEn
+      ? sameCategory.filter(item=>item.countryEn===product.countryEn)
+      : [];
+    return {
+      countryLabel:sameCountry.length
+        ? (product.countryZh || COUNTRY_BY_EN[product.countryEn]?.zh || product.countryEn || '全部国家')
+        : '全部国家',
+      categoryLabel:product.categoryZh || CATEGORY_BY_EN[product.categoryEn]?.zh || product.categoryEn || '全部品类'
+    };
+  }
+  return {
+    countryLabel:selectedCountry ? (COUNTRY_BY_EN[selectedCountry]?.zh || selectedCountry) : '全部国家',
+    categoryLabel:selectedCategory ? (CATEGORY_BY_EN[selectedCategory]?.zh || selectedCategory) : '全部品类'
+  };
+}
+function calcPercentile(values,target){
+  if(!values.length) return 0;
+  const lessOrEqual=values.filter(value=>value<=target).length;
+  return Math.round((lessOrEqual/values.length)*100);
+}
+function calcReversePercentile(values,target){
+  if(!values.length) return 0;
+  const greaterOrEqual=values.filter(value=>value>=target).length;
+  return Math.round((greaterOrEqual/values.length)*100);
+}
+function buildProductPercentiles(product){
+  const peers=getPeerProducts(product);
+  return {
+    health:product.health!=null?calcPercentile(peers.map(item=>item.health).filter(value=>value!=null),product.health):0,
+    price:product.price!=null?calcPercentile(peers.filter(item=>item.price!=null).map(item=>item.price),product.price):0,
+    nutri:product.nutriscore_num!=null?calcReversePercentile(peers.map(item=>item.nutriscore_num).filter(value=>value!=null).map(value=>6-value),6-product.nutriscore_num):0,
+    completeness:product.completeness!=null?calcPercentile(peers.map(item=>item.completeness).filter(value=>value!=null),product.completeness):0,
+    sugars:product.sugars!=null?calcPercentile(peers.map(item=>item.sugars).filter(value=>value!=null),product.sugars):0,
+    fat:product.fat!=null?calcPercentile(peers.map(item=>item.fat).filter(value=>value!=null),product.fat):0
+  };
+}
+function renderDetailRadar(containerId, seriesItems){
+  const target=document.getElementById(containerId);
+  if(!target) return;
+  const radarChart=echarts.init(target);
+  const compareCount=Math.max(1, seriesItems.length - 1);
+  radarChart.setOption({
+    backgroundColor:'transparent',
+    tooltip:{trigger:'item'},
+    legend:{
+      bottom:0,
+      itemWidth:12,
+      itemHeight:8,
+      textStyle:{color:'#866b4f',fontSize:10}
+    },
+    radar:{
+      center:['50%','46%'],
+      radius:compareCount >= 3 ? '58%' : (compareCount === 2 ? '62%' : '66%'),
+      splitNumber:4,
+      axisName:{color:'#896e53',fontSize:11},
+      splitArea:{areaStyle:{color:['rgba(255,251,244,0.68)','rgba(249,239,223,0.68)']}},
+      splitLine:{lineStyle:{color:'#e7d3bb'}},
+      axisLine:{lineStyle:{color:'#dcc7ac'}},
+      indicator:[
+        {name:'健康',max:100},
+        {name:'价格',max:100},
+        {name:'Nutri-Score',max:100},
+        {name:'完整度',max:100},
+        {name:'糖',max:100},
+        {name:'脂肪',max:100}
+      ]
+    },
+    series:[{
+      type:'radar',
+      data:seriesItems
+    }]
+  });
+  window.addEventListener('resize',()=>radarChart.resize(),{once:true});
+}
+function renderCompareSummary(){
+  const body=document.getElementById('compareSummaryBody');
+  const compared=comparedProductIds.map(id=>PRODUCTS.find(item=>item.id===id)).filter(Boolean);
+  if(!compared.length){
+    body.className='compare-empty';
+    body.textContent='尚未选择对比产品';
+    return;
+  }
+  body.className='compare-grid';
+  body.innerHTML=compared.map(item=>`
+    <div class="compare-card" data-id="${item.id}">
+      <div class="compare-card-head">
+        <div>
+          <div class="compare-card-title">${item.name}</div>
+          <div class="compare-sub">${item.countryZh} · ${item.categoryZh} · ${item.brand}</div>
+        </div>
+        <button class="compare-remove" type="button" data-remove-id="${item.id}">×</button>
+      </div>
+      <div class="compare-metrics">
+        <div class="compare-metric"><span>价格</span><strong>${formatPrice(item.price, 'EUR')}</strong></div>
+        <div class="compare-metric"><span>健康</span><strong>${item.health.toFixed(2)}</strong></div>
+        <div class="compare-metric"><span>异常</span><strong>${item.anomaly.toFixed(2)}</strong></div>
+        <div class="compare-metric"><span>完整度</span><strong>${Math.round(item.completeness*100)}%</strong></div>
+      </div>
+    </div>
+  `).join('');
+  body.querySelectorAll('[data-remove-id]').forEach(btn=>{
+    btn.addEventListener('click',event=>{
+      event.stopPropagation();
+      toggleCompareProduct(btn.dataset.removeId);
+    });
+  });
+  body.querySelectorAll('.compare-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const item=PRODUCTS.find(product=>product.id===card.dataset.id);
+      if(item) showProductDetail(item);
+    });
+  });
+}
+function toggleCompareProduct(productId){
+  if(comparedProductIds.includes(productId)){
+    comparedProductIds=comparedProductIds.filter(id=>id!==productId);
+  } else if(comparedProductIds.length>=MAX_COMPARE_PRODUCTS){
+    comparedProductIds=[...comparedProductIds.slice(1), productId];
+  } else {
+    comparedProductIds=[...comparedProductIds, productId];
+  }
+  document.getElementById('compareBtn').textContent=comparedProductIds.length?`产品对比 (${comparedProductIds.length})`:'产品对比';
+  renderCompareSummary();
+  renderProductExplainPanel();
+  renderTable();
 }
 
 // ========== Charts ==========
 const mapChart=echarts.init(document.getElementById('chartMap'));
 const anomalyChart=echarts.init(document.getElementById('chartAnomaly'));
 const sunChart=echarts.init(document.getElementById('chartSunburst'));
-const parallelChart=echarts.init(document.getElementById('chartParallel'));
+const peerRankChart=echarts.init(document.getElementById('chartPeerRank'));
 const heatmapChart=echarts.init(document.getElementById('chartHeatmap'));
 const boxplotChart=echarts.init(document.getElementById('chartBoxplot'));
 
@@ -543,19 +1280,32 @@ function quartiles(values){
 
 // ========== 2: 地图 ==========
 function renderMap(){
-  const metricKey=currentMetric==='health_score'?'health':currentMetric;
+  const metricKey=getCurrentMetricKey();
+  const filteredProducts=getFilteredProducts();
+  const countryStats=buildCountryStats(metricKey, filteredProducts);
+  const countryMetricMap=new Map(
+    COUNTRIES.map(country=>[country.en, countryStats.get(country.en)?.metricMean ?? null])
+  );
+  const metricValues=Array.from(countryMetricMap.values()).filter(v=>v!=null);
+  const visualMin=metricValues.length?Math.min(...metricValues):0;
+  const visualMax=metricValues.length?Math.max(...metricValues):1;
   const data=COUNTRIES.map(c=>{
-    if(!mapZoomedTo) return {name:c.en,value:c[metricKey]||c.health};
-    return {name:c.en,value:c.en===mapZoomedTo?(c[metricKey]||c.health):-1};
+    const metricValue=countryMetricMap.get(c.en);
+    if(!mapZoomedTo) return {name:c.en,value:metricValue};
+    return {name:c.en,value:c.en===mapZoomedTo?metricValue:-1};
   });
   const option={
     backgroundColor:'transparent',
     tooltip:{trigger:'item',formatter:p=>{
-      if(!p.value||p.value<0) return p.name+'<br/><span style="color:#aaa">(未选中)</span>';
+      const pointValue=toNumberOrNull(p.value);
+      if(pointValue==null || pointValue<0) return p.name+'<br/><span style="color:#aaa">(未选中)</span>';
       const c=COUNTRIES.find(x=>x.en===p.name);
-      return c?`<b>${c.zh} / ${c.en}</b><br/>${getMetricLabel()}: ${p.value.toFixed(2)}<br/>样本: ${c.samples.toLocaleString()}<br/>均价: €${c.price.toFixed(2)}`:`${p.name}`;
+      const stat=countryStats.get(p.name);
+      const meanPrice=stat?.priceMean ?? (c?getCountryMeanPrice(c.en):null);
+      const filteredSamples=stat?.samples ?? 0;
+      return c?`<b>${c.zh} / ${c.en}</b><br/>${getMetricLabel()}: ${pointValue.toFixed(2)}<br/>样本: ${filteredSamples.toLocaleString()}<br/>均价: ${formatPrice(meanPrice ?? c.price, 'EUR')}`:`${p.name}`;
     }},
-    visualMap:{min:metricKey==='health'||metricKey==='nutriscore'?0.2:0,max:metricKey==='health'||metricKey==='nutriscore'?0.8:(metricKey==='salt'?1.1:35),text:[getMetricLabel(),''],textStyle:{color:'#876b50',fontSize:11},left:22,bottom:20,calculable:true,itemWidth:12,itemHeight:126,inRange:{color:['#f6ddbc','#eca864','#d27b3f','#94663b']},outOfRange:{color:'#ecd8bb'}},
+    visualMap:{min:visualMin,max:visualMax,text:[getMetricLabel(),''],textStyle:{color:'#876b50',fontSize:11},left:22,bottom:20,calculable:true,itemWidth:12,itemHeight:126,inRange:{color:['#f6ddbc','#eca864','#d27b3f','#94663b']},outOfRange:{color:'#ecd8bb'}},
     geo:{map:'world-foodatlas',roam:false,left:110,right:92,top:24,bottom:40,zoom:mapZoomedTo?3:1.06,center:mapZoomedTo?COUNTRY_CENTERS[mapZoomedTo]:undefined,itemStyle:{areaColor:'#ecd8bb',borderColor:'#b78d63',borderWidth:0.9},emphasis:{itemStyle:{areaColor:'#d78a49'},label:{show:!mapZoomedTo?false:true,color:'#5c3a1e'}},regions:mapZoomedTo?COUNTRIES.map(c=>({name:c.en,label:{show:c.en===mapZoomedTo,fontSize:16,fontWeight:'bold',color:'#4a3728'}})):[]},
     series:[{type:'map',map:'world-foodatlas',geoIndex:0,data,itemStyle:{borderColor:'#b78d63',borderWidth:0.9}}]
   };
@@ -567,7 +1317,10 @@ function renderMap(){
       selectedCountry=params.name;mapZoomedTo=params.name;
       document.getElementById('countrySelect').value=selectedCountry;
       document.getElementById('mapBackBtn').style.display='inline-block';
-      updateKPIs();refreshViews();
+      loadScopedProducts().then(()=>{
+        updateKPIs();
+        refreshViews();
+      }).catch(error=>console.error('Failed to reload scoped products', error));
     }
   });
 }
@@ -582,49 +1335,108 @@ function resetMapView(){
     mapChart.dispatchAction({type:'unselect',seriesIndex:0,name:prev});
   }
   mapChart.dispatchAction({type:'downplay'});
-  updateKPIs();refreshViews();
+  loadScopedProducts().then(()=>{
+    updateKPIs();
+    refreshViews();
+  }).catch(error=>console.error('Failed to reload scoped products', error));
 }
 document.getElementById('mapBackBtn').addEventListener('click',resetMapView);
 
 // ========== 4: 旭日图 ==========
 function renderSunburst(){
-  const cats=selectedCategory?CATEGORIES.filter(c=>c.en===selectedCategory):CATEGORIES;
-  const metricKey=currentMetric==='health_score'?'health':currentMetric;
-  const allVals=CATEGORIES.map(c=>c[metricKey]||0);
-  const vMin=Math.min(...allVals),vMax=Math.max(...allVals);
-  const data=cats.map(c=>{
-    const val=c[metricKey]||0;
-    const t=vMax>vMin?(val-vMin)/(vMax-vMin):0.5;
+  const metricKey=currentMetric==='health_score'?'health':currentMetric==='nutriscore'?'nutriscore_num':currentMetric;
+  const sourceProducts=getSunburstProducts();
+  const categoryStats=new Map();
+  sourceProducts.forEach(item=>{
+    if(!item.categoryEn || !CATEGORY_BY_EN[item.categoryEn]) return;
+    const existing=categoryStats.get(item.categoryEn) || { count:0, metricSum:0, metricCount:0 };
+    existing.count+=1;
+    const metricValue=toNumberOrNull(item[metricKey]);
+    if(metricValue!=null){
+      existing.metricSum+=metricValue;
+      existing.metricCount+=1;
+    }
+    categoryStats.set(item.categoryEn, existing);
+  });
+
+  const cats=(selectedCategory?CATEGORIES.filter(c=>c.en===selectedCategory):CATEGORIES)
+    .filter(category=>categoryStats.has(category.en));
+  const categoryMetrics=cats.map(category=>{
+    const stats=categoryStats.get(category.en);
+    return stats && stats.metricCount ? stats.metricSum / stats.metricCount : null;
+  }).filter(value=>value!=null);
+  const vMin=categoryMetrics.length?Math.min(...categoryMetrics):0;
+  const vMax=categoryMetrics.length?Math.max(...categoryMetrics):1;
+  const totalSamples=cats.reduce((sum, category)=>sum + (categoryStats.get(category.en)?.count || 0), 0);
+  const data=cats.map(category=>{
+    const stats=categoryStats.get(category.en);
+    const metricValue=stats && stats.metricCount ? stats.metricSum / stats.metricCount : null;
+    const t=metricValue!=null && vMax>vMin?(metricValue-vMin)/(vMax-vMin):0.5;
     const r=Math.round(255-t*60),g=Math.round(215-t*160),b=Math.round(185-t*140);
-    return {name:c.zh,value:c.samples,itemStyle:{color:`rgb(${r},${g},${b})`}};
+    return {
+      name:category.zh,
+      value:stats?.count || 0,
+      metricValue,
+      share:totalSamples?((stats?.count || 0)/totalSamples)*100:0,
+      itemStyle:{color:`rgb(${r},${g},${b})`}
+    };
   });
   sunChart.setOption({
     backgroundColor:'transparent',
     tooltip:{trigger:'item',formatter:p=>{
-      const cat=CATEGORIES.find(c=>c.zh===p.name);
-      const mv=cat?(cat[metricKey]??'-'):'-';
-      return `<b>${p.name}</b><br/>${getMetricLabel()}: ${typeof mv==='number'?mv.toFixed(1):mv}<br/>样本: ${p.value?.toLocaleString()}<br/>占比: ${p.percent}%`;
+      const metricValue=toNumberOrNull(p.data?.metricValue);
+      const share=toNumberOrNull(p.data?.share) ?? 0;
+      return `<b>${p.name}</b><br/>${getMetricLabel()}: ${metricValue!=null?metricValue.toFixed(1):'—'}<br/>样本: ${p.value?.toLocaleString?.() ?? p.value}<br/>占比: ${share.toFixed(1)}%`;
     }},
     series:[{type:'sunburst',data,radius:['22%','88%'],center:['50%','50%'],
-      label:{rotate:selectedCategory?0:'radial',fontSize:selectedCategory?22:11,fontWeight:'bold',color:'#533821'},
+      label:{rotate:'radial',fontSize:11,fontWeight:'bold',color:'#533821'},
       emphasis:{itemStyle:{borderColor:'#b3471d',borderWidth:3}}}]},
     {notMerge:false,lazyUpdate:false});
   sunChart.off('click');
   sunChart.on('click',params=>{
     const cat=CATEGORIES.find(c=>c.zh===params.name);
-    if(cat){selectedCategory=selectedCategory===cat.en?'':cat.en;document.getElementById('categorySelect').value=selectedCategory;updateKPIs();renderAnomaly();renderSunburst();renderParallel();renderBoxplot();renderTable();}
+    if(cat){
+      selectedCategory=selectedCategory===cat.en?'':cat.en;
+      document.getElementById('categorySelect').value=selectedCategory;
+      loadScopedProducts().then(()=>{
+        updateKPIs();
+        renderAnomaly();
+        renderSunburst();
+        renderPeerRank();
+        renderBoxplot();
+        renderTable();
+      }).catch(error=>console.error('Failed to reload scoped products', error));
+    }
   });
 }
 
 // ========== 3: 异常散点图 ==========
 function renderAnomaly(){
-  let data=filterProducts(MOCK_PRODUCTS);
+  let data=getFilteredProducts();
   const xKey=document.getElementById('anomalyX').value;
   const yKey=document.getElementById('anomalyY').value;
-  const xMeta=AXIS_META[xKey],yMeta=AXIS_META[yKey];
+  const xMeta=getAxisMeta(xKey),yMeta=getAxisMeta(yKey);
+  data=data.filter(d=>hasMetricValue(d, xKey) && hasMetricValue(d, yKey));
+  const seriesCategories=selectedCategory?CATEGORIES.filter(cat=>cat.en===selectedCategory):CATEGORIES;
+  const legendSelected=Object.fromEntries(
+    seriesCategories.map(cat=>[cat.zh, selectedCategory ? true : anomalyLegendSelection[cat.en] !== false])
+  );
+  const series=seriesCategories.map(cat=>({
+    name:cat.zh,type:'scatter',
+    data:data.filter(d=>d.categoryEn===cat.en).map(d=>({...d,value:[d[xKey],d[yKey]]})),
+    symbolSize:(value,params)=>anomalyToSymbolSize(params?.data?.anomaly),
+    itemStyle:{color:CAT_COLORS[cat.en],opacity:0.78},
+    emphasis:{itemStyle:{borderColor:'#333',borderWidth:2,opacity:1}}
+  }));
   anomalyChart.setOption({
     backgroundColor:'transparent',
-    legend:{data:CATEGORIES.map(c=>c.zh),top:5,textStyle:{color:'#866b4f',fontSize:10},itemGap:8},
+    legend:{
+      data:seriesCategories.map(c=>c.zh),
+      selected:legendSelected,
+      top:5,
+      textStyle:{color:'#866b4f',fontSize:10},
+      itemGap:8
+    },
     tooltip:{trigger:'item',formatter:p=>{
       const d=p.data;return `<b>${d?.name}</b><br/>品类: ${d?.categoryZh}<br/>国家: ${d?.countryZh}<br/>${xMeta.label}: ${d?.[xKey]?.toFixed?.(2)??'-'} ${xMeta.unit}<br/>${yMeta.label}: ${d?.[yKey]?.toFixed?.(2)??'-'} ${yMeta.unit}<br/>异常度: ${d?.anomaly?.toFixed?.(2)??'-'}`;
     }},
@@ -633,23 +1445,43 @@ function renderAnomaly(){
     yAxis:{name:yMeta.label,nameLocation:'center',nameGap:50,nameTextStyle:{color:'#866b4f',fontSize:12},axisLine:{lineStyle:{color:'#d4bea1'}},axisLabel:{color:'#866b4f'},splitLine:{lineStyle:{color:'#efe0cc'}}},
     toolbox:{feature:{brush:{type:['rect','polygon']}},right:10,top:5},
     brush:{toolbox:['rect','polygon'],throttleType:'debounce',throttleDelay:300},
-    series:CATEGORIES.map(cat=>({
-      name:cat.zh,type:'scatter',
-      data:data.filter(d=>d.categoryEn===cat.en).map(d=>({...d,value:[d[xKey],d[yKey]]})),
-      symbolSize:d=>Math.min(22,Math.max(6,(d.anomaly||1)*3.5+4)),
-      itemStyle:{color:CAT_COLORS[cat.en],opacity:0.78},
-      emphasis:{itemStyle:{borderColor:'#333',borderWidth:2,opacity:1}}
-    }))
-  },{notMerge:false,lazyUpdate:false});
+    series
+  },{notMerge:false,lazyUpdate:false,replaceMerge:['series']});
   anomalyChart.off('click');
   anomalyChart.on('click',params=>{if(params.data)showProductDetail(params.data,params.event);});
+  anomalyChart.off('legendselectchanged');
+  anomalyChart.on('legendselectchanged',params=>{
+    if(selectedCategory){
+      anomalyLegendSelection={[selectedCategory]:true};
+      renderPeerRank();
+      renderHeatmap();
+      renderTable();
+      return;
+    }
+    Object.entries(params.selected || {}).forEach(([zhLabel, isVisible])=>{
+      const category=CATEGORIES.find(item=>item.zh===zhLabel);
+      if(category) anomalyLegendSelection[category.en]=isVisible;
+    });
+    renderPeerRank();
+    renderHeatmap();
+    renderTable();
+  });
   anomalyChart.off('brushSelected');
-  anomalyChart.on('brushSelected',params=>{if(params.batch&&params.batch[0]?.selected?.length>0)showProductDetail(params.batch[0].selected[0].data);});
+  anomalyChart.on('brushSelected',params=>{
+    const selected=params.batch?.[0]?.selected || [];
+    for (const group of selected) {
+      if (group.dataIndex?.length) {
+        const seriesModel=anomalyChart.getModel().getSeriesByIndex(group.seriesIndex);
+        const item=seriesModel?.getData()?.getRawDataItem(group.dataIndex[0]);
+        if(item){showProductDetail(item);break;}
+      }
+    }
+  });
 }
-document.getElementById('anomalyX').addEventListener('change',renderAnomaly);
-document.getElementById('anomalyY').addEventListener('change',renderAnomaly);
+document.getElementById('anomalyX').addEventListener('change',()=>{renderAnomaly();renderHeatmap();});
+document.getElementById('anomalyY').addEventListener('change',()=>{renderAnomaly();renderHeatmap();});
 
-// ========== 9: 单产品解释（地图内悬浮抽屉） ==========
+// ========== 9: 产品解释（地图内悬浮抽屉） ==========
 const detailOverlay=document.getElementById('detailOverlay');
 const detailToggle=document.getElementById('detailDrawerToggle');
 const detailClose=document.getElementById('detailDrawerClose');
@@ -662,138 +1494,440 @@ function setDetailDrawer(open){
 }
 detailToggle.addEventListener('click',()=>setDetailDrawer(!detailOverlay.classList.contains('is-open')));
 detailClose.addEventListener('click',()=>setDetailDrawer(false));
-function showProductDetail(d,event){
-  if(!d) return;
+
+function renderProductExplainPanel(){
   const shell=document.getElementById('detailShell');
-  const flags=d.flag==='high'?'高异常':d.flag==='warn'?'关注':'正常';
-  const flagCls=d.flag==='high'?'flag-red':d.flag==='warn'?'flag-orange':'flag-green';
+  const compared=comparedProductIds.map(id=>PRODUCTS.find(item=>item.id===id)).filter(Boolean).slice(0,3);
+  const selected=getSelectedProduct();
+  const products=compared.length
+    ? compared
+    : (selected ? [selected] : []);
+
+  if(!products.length){
+    shell.innerHTML='<div class="detail-card" style="text-align:center;padding:40px;color:var(--muted);">点击散点、排行点或表格行查看产品解释，也可在对比区中选择最多 3 个产品。</div>';
+    setDetailDrawer(false);
+    return;
+  }
+
+  const gridClass=products.length===1?'detail-compare-grid':(products.length===2?'detail-compare-grid has-two':'detail-compare-grid has-three');
+  const radarId='detailRadarCompare';
+  const radarSeries=products.map((product,index)=>{
+    const percentiles=buildProductPercentiles(product);
+    const palette=[
+      {line:'#d68849',area:'rgba(214,136,73,0.20)',point:'#d68849'},
+      {line:'#7ea7bf',area:'rgba(126,167,191,0.18)',point:'#7ea7bf'},
+      {line:'#a987b8',area:'rgba(169,135,184,0.16)',point:'#a987b8'}
+    ][index] || {line:'#b78d63',area:'rgba(183,141,99,0.16)',point:'#b78d63'};
+    return {
+      value:[percentiles.health,percentiles.price,percentiles.nutri,percentiles.completeness,percentiles.sugars,percentiles.fat],
+      name:product.name,
+      areaStyle:{color:palette.area},
+      lineStyle:{color:palette.line,width:2},
+      itemStyle:{color:palette.point}
+    };
+  });
+  radarSeries.push({
+    value:[50,50,50,50,50,50],
+    name:'同类中位基线',
+    areaStyle:{color:'rgba(125,164,100,0.10)'},
+    lineStyle:{color:'#8b9d76',width:2,type:'dashed'},
+    itemStyle:{color:'#8b9d76'}
+  });
+
   shell.innerHTML=`
-    <div class="detail-card">
-      <div class="product-head">
-        <div><div class="product-name">${d.name}</div><div class="product-sub">${d.countryZh} · ${d.categoryZh} · ${d.brand}</div>
-          <div class="flag-wrap"><span class="flag ${flagCls}">${flags}</span></div></div>
-        <div class="product-score"><div class="score-label">健康评分</div><div class="score-value">${d.health.toFixed(2)}</div></div>
-      </div></div>
-    <div class="detail-card"><h4>关键指标</h4><div class="metric-grid">
-      <div class="metric-row"><span>价格</span><span>€${d.price.toFixed(2)}</span></div>
-      <div class="metric-row"><span>异常度</span><span>${d.anomaly.toFixed(2)}</span></div>
-      <div class="metric-row"><span>Nutri-Score</span><span>${d.nutriscore}</span></div>
-      <div class="metric-row"><span>NOVA</span><span>${d.nova}</span></div>
-      <div class="metric-row"><span>糖</span><span>${d.sugars.toFixed(1)}g</span></div>
-      <div class="metric-row"><span>盐</span><span>${d.salt.toFixed(2)}g</span></div>
-      <div class="metric-row"><span>脂肪</span><span>${d.fat.toFixed(1)}g</span></div>
-      <div class="metric-row"><span>完整度</span><span>${Math.round(d.completeness*100)}%</span></div>
-    </div></div>
-    <div class="detail-card"><h4>同类位置</h4>
-      <div class="bar-metric"><span>健康</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.health*100)}%;"></div></div><strong>${Math.round(d.health*100)}</strong></div>
-      <div class="bar-metric"><span>异常</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(Math.min(100,d.anomaly/3*100))}%;"></div></div><strong>${Math.round(d.anomaly/3*100)}</strong></div>
-      <div class="bar-metric"><span>完整度</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.completeness*100)}%;"></div></div><strong>${Math.round(d.completeness*100)}</strong></div>
+    <div class="${gridClass}">
+      ${products.map(product=>{
+        const statusMeta=getStatusMeta(product);
+        const flags=statusMeta.flag==='high'?'高异常':statusMeta.flag==='warn'?'关注':'健康';
+        const flagCls=statusMeta.pillClass;
+        const percentiles=buildProductPercentiles(product);
+        return `
+          <div class="detail-card detail-card-compact detail-product-panel">
+            <div class="product-head">
+              <div>
+                <div class="product-name">${product.name}</div>
+                <div class="product-sub">${product.countryZh} · ${product.categoryZh} · ${product.brand}</div>
+                <div class="flag-wrap"><span class="flag ${flagCls}">${flags}</span></div>
+              </div>
+              <div class="product-score">
+                <div class="score-label">健康评分</div>
+                <div class="score-value">${product.health!=null?product.health.toFixed(2):'—'}</div>
+              </div>
+            </div>
+            <div class="detail-product-body">
+              <div class="detail-panel-section">
+                <h4>关键指标</h4>
+                <div class="metric-grid">
+                  <div class="metric-row"><span>价格</span><span>${formatPrice(product.price, 'EUR')}</span></div>
+                  <div class="metric-row"><span>异常度</span><span>${product.anomaly.toFixed(2)}</span></div>
+                  <div class="metric-row"><span>Nutri-Score</span><span>${product.nutriscore || '—'}</span></div>
+                  <div class="metric-row"><span>NOVA</span><span>${product.nova ?? '—'}</span></div>
+                  <div class="metric-row"><span>糖</span><span>${product.sugars!=null?`${product.sugars.toFixed(1)}g`:'—'}</span></div>
+                  <div class="metric-row"><span>盐</span><span>${product.salt!=null?`${product.salt.toFixed(2)}g`:'—'}</span></div>
+                  <div class="metric-row"><span>脂肪</span><span>${product.fat!=null?`${product.fat.toFixed(1)}g`:'—'}</span></div>
+                  <div class="metric-row"><span>完整度</span><span>${product.completeness!=null?`${Math.round(product.completeness*100)}%`:'—'}</span></div>
+                </div>
+              </div>
+              <div class="detail-panel-section">
+                <h4>同类位置</h4>
+                <div class="bar-metric"><span>健康</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.health}%;"></div></div><strong>${percentiles.health}</strong></div>
+                <div class="bar-metric"><span>价格</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.price}%;"></div></div><strong>${percentiles.price}</strong></div>
+                <div class="bar-metric"><span>Nutri-Score</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.nutri}%;"></div></div><strong>${percentiles.nutri}</strong></div>
+                <div class="bar-metric"><span>完整度</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.completeness}%;"></div></div><strong>${percentiles.completeness}</strong></div>
+                <div class="bar-metric"><span>糖</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.sugars}%;"></div></div><strong>${percentiles.sugars}</strong></div>
+                <div class="bar-metric"><span>脂肪</span><div class="bar-track"><div class="bar-fill" style="width:${percentiles.fat}%;"></div></div><strong>${percentiles.fat}</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
     </div>
-    <div class="detail-card"><h4>解释</h4><div class="explain-list">
-      <div class="explain-item">该产品在散点图中通过框选或点击选中。</div>
-      <div class="explain-item">异常分位、健康指标与同类位置详见上方条状图和指标网格。</div>
-    </div></div>`;
+    <div class="detail-card detail-radar-card">
+      <h4>同类分位雷达图</h4>
+      <div id="${radarId}" class="detail-radar detail-radar-compare"></div>
+    </div>`;
+
+  renderDetailRadar(radarId, radarSeries);
   setDetailDrawer(true);
 }
+function showProductDetail(d,event){
+  if(!d) return;
+  selectedProductId=d.id;
+  renderProductExplainPanel();
+  renderTable();
+}
 
-// ========== 5: 平行坐标 ==========
-function renderParallel(){
-  let data=filterProducts(MOCK_PRODUCTS);
-  parallelChart.setOption({
+// ========== 5: 同类定位排行图 ==========
+function renderPeerRank(){
+  const metricKey=document.getElementById('peerMetricSelect').value;
+  const metricMeta=getAxisMeta(metricKey);
+  const selectedProduct=getSelectedProduct();
+  const activeCategories=getActiveAnomalyCategorySet();
+  let basePeers=selectedProduct
+    ? getPeerProducts(selectedProduct)
+    : getFilteredProducts().filter(item=>{
+        if(selectedCountry && item.countryEn!==selectedCountry) return false;
+        if(selectedCategory && item.categoryEn!==selectedCategory) return false;
+        return true;
+      });
+  basePeers=basePeers.filter(item=>activeCategories.has(item.categoryEn));
+
+  let peers=basePeers.filter(item=>hasMetricValue(item, metricKey));
+
+  const descendingMetrics=new Set(['health','completeness','nutriscore_num','anomaly','price']);
+  const desc=descendingMetrics.has(metricKey);
+  let sorted=peers
+    .slice()
+    .sort((a,b)=>desc ? (b[metricKey]-a[metricKey]) : (a[metricKey]-b[metricKey]))
+    .slice(0,60)
+    .map((item,index)=>({
+      ...item,
+      rank:index+1,
+      value:item[metricKey]
+    }));
+
+  if(selectedProduct && !sorted.find(item=>item.id===selectedProduct.id)){
+    const selectedPeer=peers.find(item=>item.id===selectedProduct.id);
+    if(selectedPeer){
+      const overallRank=peers
+        .slice()
+        .sort((a,b)=>desc ? (b[metricKey]-a[metricKey]) : (a[metricKey]-b[metricKey]))
+        .findIndex(item=>item.id===selectedProduct.id);
+      sorted=[...sorted.slice(0,59), { ...selectedPeer, rank: overallRank+1, value: selectedPeer[metricKey] }];
+    }
+  }
+
+  const values=sorted.map(item=>item.value).filter(v=>v!=null);
+  const median=values.length?quantile(values,0.5):null;
+  const scopeInfo=getPeerScopeInfo(selectedProduct);
+  const titleNote=activeCategories.size===0
+    ? '视图3未选择任何品类'
+    : (selectedProduct && !activeCategories.has(selectedProduct.categoryEn))
+      ? '当前高亮产品所属品类已在视图3中隐藏'
+      : selectedProduct
+        ? `当前高亮：${selectedProduct.name}`
+        : (selectedCountry || selectedCategory
+            ? '当前筛选同类样本'
+            : (activeCategories.size < CATEGORIES.length ? `当前显示 ${activeCategories.size} 个品类` : '建议先选择国家或品类'));
+
+  peerRankChart.setOption({
     backgroundColor:'transparent',
-    parallelAxis:[
-      {dim:0,name:'糖',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:50},
-      {dim:1,name:'盐',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:2.5},
-      {dim:2,name:'脂肪',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:35},
-      {dim:3,name:'能量',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:50,max:520},
-      {dim:4,name:'健康',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.1,max:0.9},
-      {dim:5,name:'价格',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.4,max:7},
-      {dim:6,name:'异常',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0,max:3.5},
-      {dim:7,name:'完整度',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},min:0.3,max:1.0}
-    ],
-    parallel:{left:38,right:26,top:26,bottom:20,parallelAxisDefault:{type:'value',nameLocation:'end',nameGap:10}},
-    tooltip:{formatter:p=>`${p.name}<br/>糖 ${p.value[0]}g · 盐 ${p.value[1]}g · 异常 ${p.value[6]}`},
-    series:[{name:'产品样本',type:'parallel',lineStyle:{width:1.4,opacity:0.36},
-      data:data.slice(0,48).map(item=>({name:item.name,value:[item.sugars,item.salt,item.fat,item.energy,item.health,item.price,item.anomaly,item.completeness],lineStyle:{color:CAT_COLORS[item.categoryEn]||'#c48346'}}))}]
-  });
+    tooltip:{trigger:'item',formatter:p=>{
+      if(p.componentType==='markLine' || !p.data?.id){
+        return `<b>当前样本中位线</b><br/>范围: ${scopeInfo.countryLabel} / ${scopeInfo.categoryLabel}<br/>${metricMeta.label}: ${median?.toFixed?.(2) ?? '-'} ${metricMeta.unit}<br/>样本数: ${sorted.length}`;
+      }
+      const d=p.data;
+      return `<b>#${d?.rank} ${d?.name}</b><br/>国家: ${d?.countryZh}<br/>品类: ${d?.categoryZh}<br/>${metricMeta.label}: ${formatMetricValue(metricKey, d?.metricValue, metricMeta)}<br/>健康: ${d?.health?.toFixed?.(2)??'-'}<br/>异常: ${d?.anomaly?.toFixed?.(2)??'-'}`;
+    }},
+    title:{
+      text:titleNote,
+      left:16,
+      top:10,
+      textStyle:{color:'#9a7a59',fontSize:11,fontWeight:'normal'}
+    },
+    grid:{left:74,right:24,top:38,bottom:58},
+    xAxis:{
+      type:'category',
+      data:sorted.map(item=>String(item.rank)),
+      name:'同类排名',
+      nameLocation:'center',
+      nameGap:36,
+      nameTextStyle:{color:'#866b4f',fontSize:12},
+      axisLine:{lineStyle:{color:'#d4bea1'}},
+      axisLabel:{color:'#866b4f',fontSize:10},
+      splitLine:{show:false}
+    },
+    yAxis:{
+      type:'value',
+      name:metricMeta.label,
+      nameLocation:'center',
+      nameGap:54,
+      nameTextStyle:{color:'#866b4f',fontSize:12},
+      axisLine:{lineStyle:{color:'#d4bea1'}},
+      axisLabel:{color:'#866b4f'},
+      splitLine:{lineStyle:{color:'#efe0cc'}}
+    },
+    series:[
+      {
+        name:'同类样本',
+        type:'scatter',
+        data:sorted.map(item=>({
+          ...item,
+          metricValue:item.value,
+          value:[String(item.rank), item.value]
+        })),
+        symbolSize:(value,params)=>{
+          const item=params?.data;
+          if(selectedProduct && item?.id===selectedProduct.id) return 18;
+          return Math.min(14, 7 + Math.log2((item?.priceRecordCount || 1)+1));
+        },
+        itemStyle:{
+          color:(params)=>{
+            const item=params.data;
+            if(selectedProduct && item?.id===selectedProduct.id) return '#c44d2b';
+            return CAT_COLORS[item?.categoryEn] || '#d68849';
+          },
+          opacity:0.82
+        },
+        markLine:median!=null ? {
+          symbol:['none','none'],
+          lineStyle:{color:'#d36a2c',type:'dashed',width:1.2},
+          label:{formatter:`中位 ${median.toFixed(2)}`, color:'#a85d23'},
+          data:[{yAxis:Number(median.toFixed(3))}]
+        } : undefined
+      }
+    ]
+  },{notMerge:false,lazyUpdate:false,replaceMerge:['series']});
+
+  peerRankChart.off('click');
+  peerRankChart.on('click',params=>{if(params.data)showProductDetail(params.data);});
 }
 
 // ========== 6: 热力图 ==========
 function renderHeatmap(){
-  const values=[];
-  COUNTRIES.forEach((country,row)=>{CATEGORIES.forEach((category,col)=>{const score=Number((country.priceCov*0.55+category.health*0.45+(rand()-0.5)*0.08).toFixed(2));values.push([col,row,score]);});});
+  const xMeta=getAxisMeta(brandBubbleX);
+  const yMeta=getAxisMeta(brandBubbleY);
+  const activeCategories=getActiveAnomalyCategorySet();
+  const points=getVisibleBrandBubbles().filter(item=>hasMetricValue(item, brandBubbleX) && hasMetricValue(item, brandBubbleY));
+  heatmapChart.resize();
+  const titleNote=selectedBrand
+    ? `当前品牌搜索：${selectedBrand}`
+    : activeCategories.size===0
+      ? '视图3未保留任何品类'
+      : activeCategories.size < CATEGORIES.length
+        ? `当前随视图3保留 ${activeCategories.size} 个品类`
+    : selectedCategory
+      ? `当前品类：${CATEGORY_BY_EN[selectedCategory]?.zh || selectedCategory}`
+      : selectedCountry
+        ? `当前国家：${COUNTRY_BY_EN[selectedCountry]?.zh || selectedCountry}`
+        : '当前显示跨品类代表性品牌';
   heatmapChart.setOption({
     backgroundColor:'transparent',
-    tooltip:{position:'top',formatter:p=>{const country=COUNTRIES[p.value[1]],category=CATEGORIES[p.value[0]];return `${country.zh} · ${category.zh}<br/>性价比指数: ${p.value[2].toFixed(2)}`;}},
-    grid:{left:84,right:14,top:16,bottom:48},
-    xAxis:{type:'category',data:CATEGORIES.map(c=>c.zh),axisLabel:{color:'#866b4f',interval:0,rotate:22,fontSize:10},axisTick:{show:false},splitArea:{show:true,areaStyle:{color:['rgba(255,248,239,0.4)','rgba(248,237,221,0.4)']}}},
-    yAxis:{type:'category',data:COUNTRIES.map(c=>c.zh),axisLabel:{color:'#866b4f',fontSize:11},axisTick:{show:false},splitArea:{show:true,areaStyle:{color:['rgba(255,248,239,0.4)','rgba(248,237,221,0.4)']}}},
-    visualMap:{min:0.3,max:0.75,right:2,top:'center',itemHeight:110,text:['高','低'],textStyle:{color:'#876b50',fontSize:10},inRange:{color:['#f9eedf','#eeb375','#cc7a43','#8d5e35']}},
-    series:[{type:'heatmap',data:values,label:{show:false},emphasis:{itemStyle:{borderColor:'#705339',borderWidth:1}}}]
+    title:{
+      text:titleNote,
+      left:16,
+      top:10,
+      textStyle:{color:'#9a7a59',fontSize:11,fontWeight:'normal'}
+    },
+    tooltip:{trigger:'item',formatter:p=>{
+      const d=p.data;
+      return `<b>${d?.brand}</b><br/>主品类: ${d?.dominantCategoryLabel || '—'}<br/>样本: ${d?.products ?? '-'}<br/>价格覆盖: ${d?.priceCoverage?.toFixed?.(1) ?? '-'}%<br/>${xMeta.label}: ${formatMetricValue(brandBubbleX, d?.xValue, xMeta)}<br/>${yMeta.label}: ${formatMetricValue(brandBubbleY, d?.yValue, yMeta)}`;
+    }},
+    grid:{left:72,right:24,top:42,bottom:52},
+    xAxis:{
+      type:'value',
+      name:xMeta.label,
+      nameLocation:'center',
+      nameGap:34,
+      nameTextStyle:{color:'#866b4f',fontSize:12},
+      axisLine:{lineStyle:{color:'#d4bea1'}},
+      axisLabel:{color:'#866b4f'},
+      splitLine:{lineStyle:{color:'#efe0cc'}}
+    },
+    yAxis:{
+      type:'value',
+      name:yMeta.label,
+      nameLocation:'center',
+      nameGap:48,
+      nameTextStyle:{color:'#866b4f',fontSize:12},
+      axisLine:{lineStyle:{color:'#d4bea1'}},
+      axisLabel:{color:'#866b4f'},
+      splitLine:{lineStyle:{color:'#efe0cc'}}
+    },
+    series:[{
+      type:'scatter',
+      data:points.map(item=>({
+        ...item,
+        xValue:item[brandBubbleX],
+        yValue:item[brandBubbleY],
+        value:[item[brandBubbleX], item[brandBubbleY]]
+      })),
+      symbolSize:(value,params)=>{
+        const categories=toNumberOrNull(params?.data?.categories) ?? 1;
+        return Number((8 + Math.max(0, categories - 1) * 3.2).toFixed(2));
+      },
+      itemStyle:{
+        color:(params)=>{
+          const category=params?.data?.dominantCategory;
+          return CAT_COLORS[category] || '#d68849';
+        },
+        opacity:0.78
+      },
+      emphasis:{itemStyle:{borderColor:'#7d512a',borderWidth:1.5,opacity:1}}
+    }]
+  });
+  heatmapChart.off('click');
+  heatmapChart.on('click',params=>{
+    const brand=params?.data?.brand;
+    if(!brand) return;
+    selectedBrand=brand;
+    document.getElementById('brandInput').value=selectedBrand;
+    updateKPIs();
+    renderAnomaly();
+    renderPeerRank();
+    renderBoxplot();
+    renderTable();
+    loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));
   });
 }
 
 // ========== 7: 箱线图 ==========
 function renderBoxplot(){
-  const focusCategory=selectedCategory||'Sweet snacks';
-  const boxData=COUNTRIES.map(country=>{const vals=MOCK_PRODUCTS.filter(item=>item.countryEn===country.en&&item.categoryEn===focusCategory).map(item=>item.price);return quartiles(vals);});
+  const focusCategory=boxplotCategoryOverride || selectedCategory || (CATEGORIES[0]?.en || '');
+  const grouped=getBoxplotValuesByCountry(focusCategory);
+  const boxData=COUNTRIES.map(country=>{
+    const vals=grouped.get(country.en) || [];
+    return vals.length?quartiles(vals):[0,0,0,0,0];
+  });
   boxplotChart.setOption({
     backgroundColor:'transparent',
     tooltip:{trigger:'item',formatter:p=>{const[min,q1,median,q3,max]=p.data;return `${COUNTRIES[p.dataIndex].zh}<br/>min ${min.toFixed(2)} · Q1 ${q1.toFixed(2)}<br/>median ${median.toFixed(2)} · Q3 ${q3.toFixed(2)}<br/>max ${max.toFixed(2)}`;}},
     grid:{left:56,right:18,top:28,bottom:44},
     xAxis:{type:'category',data:COUNTRIES.map(c=>c.zh),axisLabel:{color:'#876b50',interval:0,rotate:22,fontSize:10},axisLine:{lineStyle:{color:'#d4bea1'}}},
-    yAxis:{type:'value',name:'价格'+((selectedCurrency)?' ('+selectedCurrency+')':''),nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},axisLine:{lineStyle:{color:'#d4bea1'}},splitLine:{lineStyle:{color:'#efe0cc'}}},
+    yAxis:{type:'value',name:'价格 (€)',nameTextStyle:{color:'#876b50'},axisLabel:{color:'#876b50'},axisLine:{lineStyle:{color:'#d4bea1'}},splitLine:{lineStyle:{color:'#efe0cc'}}},
     series:[{type:'boxplot',data:boxData,itemStyle:{color:'#f6e0c2',borderColor:'#c67b41',borderWidth:1.5}}]
+  });
+  boxplotChart.off('click');
+  boxplotChart.on('click',params=>{
+    const country=COUNTRIES[params.dataIndex];
+    if(!country) return;
+    selectedCountry=country.en;
+    mapZoomedTo=country.en;
+    document.getElementById('countrySelect').value=selectedCountry;
+    document.getElementById('mapBackBtn').style.display='inline-block';
+    loadScopedProducts().then(()=>{
+      updateKPIs();
+      refreshViews();
+    }).catch(error=>console.error('Failed to reload scoped products', error));
   });
 }
 
 // ========== 8: 产品列表 ==========
 let tableSortField='anomaly',tableSortDir='desc',tableTopN=12;
 function renderTable(){
-  let data=filterProducts(MOCK_PRODUCTS);
+  let data=getFilteredProducts();
+  const activeCategories=getActiveAnomalyCategorySet();
+  data=data.filter(item=>activeCategories.has(item.categoryEn));
   // 按当前排序字段 + 方向
   data.sort((a,b)=>{
-    const va=a[tableSortField]||0,vb=b[tableSortField]||0;
-    return tableSortDir==='desc'?vb-va:va-vb;
+    const va=getTableSortValue(a, tableSortField);
+    const vb=getTableSortValue(b, tableSortField);
+    if(vb!==va){
+      return tableSortDir==='desc'?vb-va:va-vb;
+    }
+    const completenessDiff=(toNumberOrNull(b.completeness) ?? 0) - (toNumberOrNull(a.completeness) ?? 0);
+    if(completenessDiff!==0) return completenessDiff;
+    const anomalyDiff=(toNumberOrNull(a.anomaly) ?? 0) - (toNumberOrNull(b.anomaly) ?? 0);
+    if(anomalyDiff!==0) return anomalyDiff;
+    return (a.name || '').localeCompare(b.name || '');
   });
   const rows=data.slice(0,tableTopN);
   const sortLabel={price:'价格',health:'健康',anomaly:'异常度',completeness:'完整度'}[tableSortField];
   const dirLabel=tableSortDir==='desc'?'降序':'升序';
-  const cName=selectedCountry?COUNTRIES.find(c=>c.en===selectedCountry)?.zh:'全部';
-  const catName=selectedCategory?CATEGORIES.find(c=>c.en===selectedCategory)?.zh:'全部';
+  const cName=selectedCountry?COUNTRY_BY_EN[selectedCountry]?.zh:'全部';
+  const catName=selectedCategory?CATEGORY_BY_EN[selectedCategory]?.zh:'全部';
+  const categoryScopeNote=!selectedCategory && activeCategories.size < CATEGORIES.length
+    ? ` / 视图3保留${activeCategories.size}类`
+    : '';
+  const selectedProduct=getSelectedProduct();
   document.getElementById('tableSortLabel').textContent=`按${sortLabel}${dirLabel}`;
-  document.getElementById('tableFilterLabel').textContent=`当前筛选：${cName} / ${catName} / ${sortLabel}${dirLabel}`;
-  document.getElementById('tableBody').innerHTML=rows.map(item=>{
-    const st=item.flag==='high'?'异常':item.flag==='warn'?'关注':'正常';
-    const sc=item.flag==='high'?'status-bad':item.flag==='warn'?'status-warn':'status-good';
-    return `<tr data-id="${item.id}" style="cursor:pointer;" title="点击查看产品详情"><td>${item.name}</td><td>${item.brand}</td><td>${item.countryZh}</td><td>${item.categoryZh}</td><td>€${item.price.toFixed(2)}</td><td>${item.health.toFixed(2)}</td><td>${item.anomaly.toFixed(2)}</td><td>${item.nova}</td><td>${item.sugars.toFixed(1)}g</td><td>${Math.round(item.completeness*100)}%</td><td><span class="badge-cell ${sc}">${st}</span></td></tr>`;
-  }).join('');
+  document.getElementById('tableFilterLabel').textContent=`当前筛选：${cName} / ${catName} / ${sortLabel}${dirLabel}${categoryScopeNote}${tableSearchTerm?` / 搜索“${tableSearchTerm}”`:''}`;
+  document.getElementById('tableBody').innerHTML=rows.length?rows.map(item=>{
+    const statusMeta=getStatusMeta(item);
+    const st=statusMeta.text;
+    const sc=statusMeta.chipClass;
+    const rowClasses=[
+      selectedProduct?.id===item.id?'is-selected':'',
+      comparedProductIds.includes(item.id)?'is-compared':''
+    ].filter(Boolean).join(' ');
+    return `<tr class="${rowClasses}" data-id="${item.id}" style="cursor:pointer;" title="点击查看产品详情">
+      <td class="table-check-cell"><input class="table-check-input" type="checkbox" data-id="${item.id}" ${comparedProductIds.includes(item.id)?'checked':''}></td>
+      <td>${item.name}</td><td>${item.brand}</td><td>${item.countryZh}</td><td>${item.categoryZh}</td><td>${formatPrice(item.price, 'EUR')}</td><td>${item.health!=null?item.health.toFixed(2):'—'}</td><td>${item.anomaly.toFixed(2)}</td><td>${item.nova ?? '—'}</td><td>${item.sugars!=null?`${item.sugars.toFixed(1)}g`:'—'}</td><td>${item.completeness!=null?`${Math.round(item.completeness*100)}%`:'—'}</td><td><span class="badge-cell ${sc}">${st}</span></td></tr>`;
+  }).join(''):`<tr><td colspan="12" style="padding:24px 12px;text-align:center;color:var(--muted);">当前没有与视图3保留品类一致的产品</td></tr>`;
   // 行点击 → 打开产品详情
   document.querySelectorAll('#tableBody tr').forEach(tr=>{
     tr.addEventListener('click',()=>{
-      const item=MOCK_PRODUCTS.find(p=>p.id==tr.dataset.id);
+      const item=PRODUCTS.find(p=>p.id===tr.dataset.id);
       if(item) showProductDetail(item);
     });
   });
+  document.querySelectorAll('.table-check-input').forEach(input=>{
+    input.addEventListener('click',event=>{
+      event.stopPropagation();
+      toggleCompareProduct(input.dataset.id);
+    });
+  });
+  renderCompareSummary();
 }
 
 // ========== KPI 更新 ==========
 function updateKPIs(){
-  let data=filterProducts(MOCK_PRODUCTS);
+  let data=getFilteredProducts();
   const n=data.length;
+  document.getElementById('kpiSamples').textContent=TOTAL_PRODUCTS>=1000?(TOTAL_PRODUCTS/1000).toFixed(1)+'k':String(TOTAL_PRODUCTS);
+  if(!n){
+    document.getElementById('kpiFiltered').textContent='0';
+    document.getElementById('kpiHealth').textContent='—';
+    document.getElementById('kpiHealthMedian').textContent='—';
+    document.getElementById('kpiPrice').textContent='—';
+    document.getElementById('kpiPriceCov').textContent='—';
+    document.getElementById('kpiSugars').textContent='—';
+    document.getElementById('kpiSalt').textContent='—';
+    document.getElementById('kpiAnomaly').textContent='—';
+    document.getElementById('kpiHighSugar').textContent='—';
+    return;
+  }
   const avgH=data.reduce((s,d)=>s+d.health,0)/n||0;
   const pricedData=data.filter(d=>d.price!=null);const avgP=pricedData.length?pricedData.reduce((s,d)=>s+d.price,0)/pricedData.length:0;
   const avgS=data.reduce((s,d)=>s+d.sugars,0)/n||0;
   const avgSalt=data.reduce((s,d)=>s+d.salt,0)/n||0;
   const anom=data.filter(d=>d.anomaly>2.25).length;
   const hs=data.filter(d=>d.sugars>30&&d.nova>=3).length;
-  document.getElementById('kpiSamples').textContent=(MOCK_PRODUCTS.length/1000).toFixed(1)+'k';
-  document.getElementById('kpiFiltered').textContent=(n/1000).toFixed(1)+'k';
+  document.getElementById('kpiFiltered').textContent=n>=1000?(n/1000).toFixed(1)+'k':String(n);
   document.getElementById('kpiHealth').textContent=avgH.toFixed(2);
-  document.getElementById('kpiHealthMedian').textContent='0.54';
-  const curSym={EUR:"€",USD:"$",GBP:"£",CHF:"Fr.",CAD:"C$"};
-  document.getElementById('kpiPrice').textContent=selectedCurrency?(curSym[selectedCurrency]||"")+avgP.toFixed(2):"—";
-  document.getElementById('kpiPriceCov').textContent=selectedCurrency?(data.filter(d=>d.price>0).length/n*100).toFixed(1)+"%":"—";
+  document.getElementById('kpiHealthMedian').textContent=quantile(data.map(d=>d.health).filter(v=>v!=null),0.5).toFixed(2);
+  document.getElementById('kpiPrice').textContent=pricedData.length?formatPrice(avgP, 'EUR'):"—";
+  document.getElementById('kpiPriceCov').textContent=((pricedData.length/n)*100).toFixed(1)+"%";
   document.getElementById('kpiSugars').textContent=avgS.toFixed(1)+'g';
   document.getElementById('kpiSalt').textContent=avgSalt.toFixed(2)+'g';
   document.getElementById('kpiAnomaly').textContent=(anom/n*100).toFixed(1)+'%';
@@ -803,69 +1937,127 @@ function updateKPIs(){
 // ========== 控制台 ==========
 function populateSelectors(){
   const cs=document.getElementById('countrySelect');
+  cs.innerHTML='<option value="">全部国家</option>';
   COUNTRIES.forEach(c=>{const o=document.createElement('option');o.value=c.en;o.textContent=c.zh+' ('+(c.samples/1000).toFixed(0)+'k)';cs.appendChild(o);});
   const cat=document.getElementById('categorySelect');
+  cat.innerHTML='<option value="">全部品类</option>';
   CATEGORIES.forEach(c=>{const o=document.createElement('option');o.value=c.en;o.textContent=c.zh+' ('+(c.samples/1000).toFixed(0)+'k)';cat.appendChild(o);});
+  const boxSelect=document.getElementById('boxplotCategorySelect');
+  boxSelect.innerHTML='<option value="">跟随全局品类</option>';
+  CATEGORIES.forEach(c=>{const o=document.createElement('option');o.value=c.en;o.textContent=c.zh;boxSelect.appendChild(o);});
 }
 document.getElementById('countrySelect').addEventListener('change',e=>{
   selectedCountry=e.target.value;mapZoomedTo=selectedCountry||null;
   if(selectedCountry){document.getElementById('mapBackBtn').style.display='inline-block';}
   else {document.getElementById('mapBackBtn').style.display='none';}
-  updateKPIs();refreshViews();
+  loadScopedProducts().then(()=>{
+    updateKPIs();
+    refreshViews();
+  }).catch(error=>console.error('Failed to reload scoped products', error));
 });
-document.getElementById('categorySelect').addEventListener('change',e=>{selectedCategory=e.target.value;updateKPIs();renderSunburst();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+document.getElementById('categorySelect').addEventListener('change',e=>{
+  selectedCategory=e.target.value;
+  loadScopedProducts().then(()=>{
+    updateKPIs();
+    renderMap();
+    renderSunburst();
+    renderAnomaly();
+    renderPeerRank();
+    renderHeatmap();
+    renderBoxplot();
+    renderTable();
+  }).catch(error=>console.error('Failed to reload scoped products', error));
+});
 document.getElementById('metricSelect').addEventListener('change',e=>{currentMetric=e.target.value;renderMap();renderSunburst();});
-document.getElementById('brandInput').addEventListener('input',e=>{selectedBrand=e.target.value.trim();updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
-document.getElementById('anomalyThresh').addEventListener('change',e=>{anomalyThreshold=+e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
-document.getElementById('completenessThresh').addEventListener('change',e=>{completenessThreshold=+e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
-document.getElementById('priceRange').addEventListener('change',e=>{priceRange=e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
-document.getElementById('currencySelect').addEventListener('change',e=>{selectedCurrency=e.target.value;updateKPIs();renderAnomaly();renderParallel();renderBoxplot();renderTable();});
+document.getElementById('brandInput').addEventListener('input',e=>{
+  selectedBrand=e.target.value.trim();
+  updateKPIs();
+  renderMap();
+  renderAnomaly();
+  renderPeerRank();
+  renderBoxplot();
+  renderTable();
+  loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));
+});
+document.getElementById('anomalyThresh').addEventListener('change',e=>{anomalyThreshold=+e.target.value;updateKPIs();renderMap();renderAnomaly();renderPeerRank();renderBoxplot();renderTable();loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));});
+document.getElementById('completenessThresh').addEventListener('change',e=>{completenessThreshold=+e.target.value;updateKPIs();renderMap();renderAnomaly();renderPeerRank();renderBoxplot();renderTable();loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));});
+document.getElementById('priceRange').addEventListener('change',e=>{priceRange=e.target.value;updateKPIs();renderMap();renderAnomaly();renderPeerRank();renderBoxplot();renderTable();loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));});
+document.getElementById('boxplotCategorySelect').addEventListener('change',e=>{boxplotCategoryOverride=e.target.value;renderBoxplot();});
+document.getElementById('tableSearchInput').addEventListener('input',e=>{tableSearchTerm=e.target.value.trim();updateKPIs();renderMap();renderAnomaly();renderPeerRank();renderBoxplot();renderTable();});
+document.getElementById('peerMetricSelect').addEventListener('change',renderPeerRank);
+document.getElementById('brandBubbleX').addEventListener('change',e=>{
+  brandBubbleX=e.target.value;
+  loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));
+});
+document.getElementById('brandBubbleY').addEventListener('change',e=>{
+  brandBubbleY=e.target.value;
+  loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));
+});
+document.getElementById('brandBubbleMinProducts').addEventListener('change',e=>{
+  brandMinProducts=Number(e.target.value) || 10;
+  loadBrandBubbleData().then(renderHeatmap).catch(error=>console.error('Failed to reload brand bubbles', error));
+});
+document.getElementById('clearCompareBtn').addEventListener('click',()=>{
+  comparedProductIds=[];
+  renderCompareSummary();
+  renderProductExplainPanel();
+  renderTable();
+  document.getElementById('compareBtn').textContent='产品对比';
+});
 // 表格排序 chip
 document.querySelectorAll('#tableSortChips .chip').forEach(chip=>{chip.addEventListener('click',function(){const f=this.dataset.sort;if(f===tableSortField){tableSortDir=tableSortDir==='desc'?'asc':'desc';}else{tableSortField=f;tableSortDir='desc';}document.querySelectorAll('#tableSortChips .chip').forEach(c=>{c.style.background='';c.style.fontWeight='';const label={price:'价格',health:'健康',anomaly:'异常',completeness:'完整度'}[c.dataset.sort];c.textContent=label;});this.style.background='var(--accent-soft)';this.style.fontWeight='bold';const arrow=tableSortDir==='desc'?' ▾':' ▴';const label={price:'价格',health:'健康',anomaly:'异常',completeness:'完整度'}[f];this.textContent=label+arrow;renderTable();});});
 document.getElementById('tableTopN').addEventListener('change',e=>{tableTopN=+e.target.value;renderTable();});
 // 保存筛选：把当前筛选项存起来
 let savedFilters=null;
 document.getElementById('saveFilterBtn').addEventListener('click',()=>{
-  savedFilters={country:selectedCountry,category:selectedCategory,metric:currentMetric};
+  savedFilters={
+    country:selectedCountry,category:selectedCategory,metric:currentMetric,
+    brand:selectedBrand,anomalyThreshold,completenessThreshold,priceRange,
+    tableSearchTerm,boxplotCategoryOverride,
+    tableSortField,tableSortDir,tableTopN
+  };
   document.getElementById('saveFilterBtn').textContent='已保存';
   setTimeout(()=>{document.getElementById('saveFilterBtn').textContent='保存筛选';},1500);
 });
-// 切换对比：在当前筛选和已保存的筛选之间切换
+// Panel 1 对比入口：聚焦 Panel 8 对比区，并根据当前产品补入对比列表
 document.getElementById('compareBtn').addEventListener('click',()=>{
-  if(!savedFilters){alert('请先保存一组筛选条件');return;}
-  const tmp={country:selectedCountry,category:selectedCategory,metric:currentMetric};
-  selectedCountry=savedFilters.country;selectedCategory=savedFilters.category;currentMetric=savedFilters.metric;
-  savedFilters=tmp;
-  document.getElementById('countrySelect').value=selectedCountry;
-  document.getElementById('categorySelect').value=selectedCategory;
-  document.getElementById('metricSelect').value=currentMetric;
-  if(selectedCountry){mapZoomedTo=selectedCountry;document.getElementById('mapBackBtn').style.display='inline-block';}
-  else resetMapView();
-  updateKPIs();refreshViews();
-  document.getElementById('compareBtn').textContent='已切换';
-  setTimeout(()=>{document.getElementById('compareBtn').textContent='切换对比';},1500);
+  const selectedProduct=getSelectedProduct();
+  if(selectedProduct && !comparedProductIds.includes(selectedProduct.id)){
+    toggleCompareProduct(selectedProduct.id);
+  }
+  const compareSummary=document.getElementById('compareSummary');
+  compareSummary.scrollIntoView({behavior:'smooth',block:'center'});
+  compareSummary.style.boxShadow='0 0 0 2px rgba(217,137,68,0.35), 0 8px 24px rgba(114,79,37,0.12)';
+  document.getElementById('compareBtn').textContent=comparedProductIds.length?`产品对比 (${comparedProductIds.length})`:'产品对比';
+  setTimeout(()=>{
+    compareSummary.style.boxShadow='';
+    document.getElementById('compareBtn').textContent=comparedProductIds.length?`产品对比 (${comparedProductIds.length})`:'产品对比';
+  },1500);
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{
-  selectedCountry='';selectedCategory='';currentMetric='health_score';mapZoomedTo=null;
-  selectedBrand='';anomalyThreshold=0;completenessThreshold=0;priceRange='';selectedCurrency='';
-  document.getElementById('countrySelect').value='';document.getElementById('categorySelect').value='';document.getElementById('metricSelect').value='health_score';
-  document.getElementById('brandInput').value='';document.getElementById('anomalyThresh').value='0';document.getElementById('completenessThresh').value='0';document.getElementById('priceRange').value='';document.getElementById('currencySelect').value='';
-  tableSortField='anomaly';tableSortDir='desc';tableTopN=12;document.getElementById('tableTopN').value='12';
-  document.getElementById('mapBackBtn').style.display='none';
-  setDetailDrawer(false);updateKPIs();refreshViews();
+  window.location.reload();
 });
 function refreshViews(){
   renderMap();renderSunburst();renderAnomaly();
-  renderParallel();renderHeatmap();renderBoxplot();renderTable();
+  renderPeerRank();renderHeatmap();renderBoxplot();renderTable();
 }
 
 // ========== 启动 ==========
-fetch('data/world.json').then(r=>r.json()).then(geoJson=>{
+fetch('data/world.json').then(r=>r.json()).then(async geoJson=>{
   echarts.registerMap('world-foodatlas',geoJson);
-  populateSelectors();updateKPIs();refreshViews();setDetailDrawer(false);
-}).catch(()=>{populateSelectors();updateKPIs();renderSunburst();renderAnomaly();renderHeatmap();renderTable();});
+  await loadBackendData();
+  populateSelectors();
+  updateKPIs();
+  refreshViews();
+  setDetailDrawer(false);
+}).catch(error=>{
+  console.error('Failed to initialize frontend data', error);
+  const shell=document.getElementById('detailShell');
+  shell.innerHTML='<div class="detail-card" style="text-align:center;padding:40px;color:var(--muted);">后端数据加载失败，请确认 app.py 服务已启动。</div>';
+  setDetailDrawer(false);
+});
 
-window.addEventListener('resize',()=>{mapChart.resize();sunChart.resize();anomalyChart.resize();parallelChart.resize();heatmapChart.resize();boxplotChart.resize();});
+window.addEventListener('resize',()=>{mapChart.resize();sunChart.resize();anomalyChart.resize();peerRankChart.resize();heatmapChart.resize();boxplotChart.resize();});
 </script>
 </body>
 </html>

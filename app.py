@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,8 @@ PRODUCTS_PATH = BASE_DIR / "datasets_preprocessed" / "products_analysis.parquet"
 
 DEFAULT_ANOMALY_LIMIT = 4000
 DEFAULT_PRICE_LIMIT = 4000
+ANOMALY_DISPLAY_MIN = 0.4
+ANOMALY_DISPLAY_MAX = 3.5
 
 COUNTRY_META = {
     "en:france": {"name": "法国", "enName": "France"},
@@ -31,45 +34,142 @@ COUNTRY_META = {
 }
 
 CATEGORY_META = {
-    "en:sweet-snacks": {"name": "甜食", "enName": "Sweet snacks", "parent": "零食"},
-    "en:plant-based-foods": {
-        "name": "植物基食品",
-        "enName": "Plant-based foods",
-        "parent": "",
-    },
+    "en:sugary-snacks": {"name": "甜味零食", "enName": "Sugary snacks", "parent": ""},
+    "en:appetizers": {"name": "开胃食品", "enName": "Appetizers", "parent": ""},
+    "en:salty-snacks": {"name": "咸味零食", "enName": "Salty snacks", "parent": ""},
+    "en:beverages": {"name": "饮料", "enName": "Beverages", "parent": ""},
     "en:cereals-and-potatoes": {
         "name": "谷物与土豆",
         "enName": "Cereals & potatoes",
         "parent": "",
     },
-    "en:desserts": {"name": "甜点", "enName": "Desserts", "parent": ""},
-    "en:beverages": {"name": "饮料", "enName": "Beverages", "parent": ""},
-    "en:snacks": {"name": "零食", "enName": "Snacks", "parent": ""},
-    "en:fermented-milk-products": {
-        "name": "发酵乳制品",
-        "enName": "Fermented milk",
-        "parent": "乳制品",
+    "en:milk-and-dairy-products": {
+        "name": "乳制品",
+        "enName": "Milk & dairy",
+        "parent": "",
     },
-    "en:dairies": {"name": "乳制品", "enName": "Dairies", "parent": ""},
-    "en:plant-based-foods-and-beverages": {
-        "name": "植物基食品与饮料",
-        "enName": "Plant-based foods & beverages",
-        "parent": "植物基食品",
+    "en:fish-meat-eggs": {
+        "name": "鱼肉蛋类",
+        "enName": "Fish, meat & eggs",
+        "parent": "",
     },
-    "en:fermented-foods": {
-        "name": "发酵食品",
-        "enName": "Fermented foods",
+    "en:fruits-and-vegetables": {
+        "name": "果蔬制品",
+        "enName": "Fruits & vegetables",
+        "parent": "",
+    },
+    "en:fats-and-sauces": {
+        "name": "油脂与酱料",
+        "enName": "Fats & sauces",
+        "parent": "",
+    },
+    "en:composite-foods": {
+        "name": "复合食品",
+        "enName": "Composite foods",
         "parent": "",
     },
 }
 
 NUTRISCORE_TO_NUM = {"a": 5, "b": 4, "c": 3, "d": 2, "e": 1}
+FX_TO_EUR = {
+    "EUR": 1.0,
+    "USD": 0.92,
+    "GBP": 1.17,
+    "CHF": 1.04,
+    "CAD": 0.68,
+    "NOK": 0.086,
+    "SEK": 0.088,
+    "PLN": 0.23,
+    "MXN": 0.05,
+    "TWD": 0.029,
+    "RUB": 0.01,
+    "MAD": 0.091,
+    "ADP": 1.0 / 166.386,
+    "RON": 0.20,
+    "UAH": 0.022,
+    "ILS": 0.25,
+    "INR": 0.011,
+    "XPF": 0.00838,
+    "CZK": 0.04,
+    "ALL": 0.01,
+    "PAB": 0.92,
+    "JPY": 0.0061,
+    "AUD": 0.61,
+    "HUF": 0.0025,
+    "BGN": 0.511,
+    "ARS": 0.0010,
+    "DKK": 0.134,
+    "MYR": 0.20,
+    "TND": 0.30,
+    "PHP": 0.016,
+    "RSD": 0.0085,
+    "SGD": 0.68,
+    "BAM": 0.511,
+    "ISK": 0.0068,
+    "KZT": 0.0018,
+    "QAR": 0.25,
+    "XAF": 1.0 / 655.957,
+    "DOP": 0.015,
+    "KRW": 0.00067,
+    "TRY": 0.027,
+    "THB": 0.025,
+    "HKD": 0.118,
+    "LYD": 0.19,
+    "MRU": 0.024,
+    "AED": 0.25,
+    "LAK": 0.000042,
+    "AFN": 0.012,
+    "BMD": 0.92,
+    "TZS": 0.00034,
+    "DZD": 0.0069,
+    "XOF": 1.0 / 655.957,
+    "LBP": 0.00001,
+}
 
 
 def round_or_none(value: Any, digits: int) -> float | None:
     if value is None:
         return None
     return round(float(value), digits)
+
+
+def add_display_anomaly_column(
+    df: pl.DataFrame,
+    *,
+    source_col: str = "peer_anomaly_score",
+    target_col: str = "anomaly_display",
+) -> pl.DataFrame:
+    valid = df.filter(pl.col(source_col).is_not_null() & (pl.col(source_col) >= 0))
+    if valid.height == 0:
+        return df.with_columns(pl.lit(ANOMALY_DISPLAY_MIN).alias(target_col))
+
+    stats = valid.select(
+        [
+            pl.col(source_col).quantile(0.05).alias("floor"),
+            pl.col(source_col).quantile(0.98).alias("cap"),
+        ]
+    ).row(0, named=True)
+    floor = float(stats["floor"] or ANOMALY_DISPLAY_MIN)
+    cap = float(stats["cap"] or floor)
+    cap = max(cap, floor + 1e-6)
+    low = math.log1p(floor)
+    high = max(low + 1e-6, math.log1p(cap))
+
+    scaled = (
+        (
+            (pl.col(source_col).clip(floor, cap).log1p() - pl.lit(low))
+            / pl.lit(high - low)
+        )
+        * (ANOMALY_DISPLAY_MAX - ANOMALY_DISPLAY_MIN)
+        + ANOMALY_DISPLAY_MIN
+    ).clip(ANOMALY_DISPLAY_MIN, ANOMALY_DISPLAY_MAX)
+
+    return df.with_columns(
+        pl.when(pl.col(source_col).is_not_null() & (pl.col(source_col) >= 0))
+        .then(scaled)
+        .otherwise(pl.lit(ANOMALY_DISPLAY_MIN))
+        .alias(target_col)
+    )
 
 
 def title_from_tag(tag: str) -> str:
@@ -90,6 +190,27 @@ def category_display(tag: str) -> dict[str, str]:
         return meta
     fallback = title_from_tag(tag)
     return {"name": fallback, "enName": fallback, "parent": ""}
+
+
+def brand_display(tag: str | None) -> str:
+    if not tag:
+        return "Unknown"
+    label = tag.split(":", 1)[-1].replace("-", " ").strip()
+    return label.title() if label else "Unknown"
+
+
+BRAND_METRIC_META = {
+    "health": {"column": "health_score_composite", "label": "品牌平均健康评分"},
+    "anomaly": {"column": "anomaly_display", "label": "品牌平均异常度"},
+    "completeness": {"column": "data_completeness_score", "label": "品牌平均完整度"},
+    "nutriscore_num": {"column": "nutriscore_num", "label": "品牌平均 Nutri-Score"},
+    "nova": {"column": "nova_group", "label": "品牌平均 NOVA"},
+    "price": {"column": "price_eur_clean", "label": "品牌均价 (€)"},
+    "sugars": {"column": "sugars_100g", "label": "品牌中位糖含量"},
+    "salt": {"column": "salt_equivalent_100g", "label": "品牌中位盐含量"},
+    "fat": {"column": "fat_100g", "label": "品牌中位脂肪含量"},
+    "energy": {"column": "energy_kcal_100g", "label": "品牌中位能量"},
+}
 
 
 class FoodAtlasStore:
@@ -130,8 +251,19 @@ class FoodAtlasStore:
             "flag_high_sugar_high_nova",
             "flag_low_completeness_many_warnings",
         ]
+        fx_rate_expr = pl.col("currency").replace(FX_TO_EUR, default=None).cast(pl.Float64)
         return pl.read_parquet(products_path, columns=columns).with_columns(
             [
+                pl.col("primary_brand_tag").alias("brand_tag"),
+                pl.when(pl.col("primary_brand_tag").is_not_null())
+                .then(
+                    pl.col("primary_brand_tag")
+                    .str.replace(r"^.*?:", "")
+                    .str.replace_all("-", " ")
+                    .str.to_titlecase()
+                )
+                .otherwise(pl.lit("Unknown"))
+                .alias("brand_name"),
                 pl.col("product_name").fill_null(pl.col("code")).alias("product_name"),
                 pl.col("nutriscore_grade")
                 .str.to_lowercase()
@@ -142,11 +274,20 @@ class FoodAtlasStore:
                 .then(pl.col("price_median"))
                 .otherwise(None)
                 .alias("price_median_clean"),
+                fx_rate_expr.alias("fx_rate_to_eur"),
+                pl.when(
+                    pl.col("price_median").is_not_null()
+                    & (pl.col("price_median") > 0)
+                    & fx_rate_expr.is_not_null()
+                )
+                .then(pl.col("price_median") * fx_rate_expr)
+                .otherwise(None)
+                .alias("price_eur_clean"),
             ]
         )
 
     def _build_country_summary(self) -> list[dict[str, Any]]:
-        df = (
+        base_df = (
             self.products.group_by("analysis_country_tag")
             .agg(
                 [
@@ -158,8 +299,23 @@ class FoodAtlasStore:
                     pl.col("energy_kcal_100g").mean().alias("energy"),
                     pl.col("nutriscore_num").mean().alias("nutriscore"),
                     pl.col("nova_group").mean().alias("nova"),
+                    pl.col("peer_anomaly_score").mean().alias("anomaly"),
+                    pl.col("price_eur_clean").is_not_null().mean().alias("price_cov"),
                 ]
             )
+        )
+        price_df = (
+            self.products.filter(pl.col("price_eur_clean").is_not_null())
+            .group_by("analysis_country_tag")
+            .agg(
+                [
+                    pl.len().alias("price_records"),
+                    pl.col("price_eur_clean").mean().alias("price"),
+                ]
+            )
+        )
+        df = (
+            base_df.join(price_df, on="analysis_country_tag", how="left")
             .sort("samples", descending=True)
         )
         records: list[dict[str, Any]] = []
@@ -177,6 +333,11 @@ class FoodAtlasStore:
                     "energy": round_or_none(row["energy"], 1),
                     "nutriscore": round_or_none(row["nutriscore"], 2),
                     "nova": round_or_none(row["nova"], 2),
+                    "anomaly": round_or_none(row["anomaly"], 3),
+                    "price": round_or_none(row["price"], 2),
+                    "priceCurrency": "EUR" if row["price"] is not None else None,
+                    "priceCov": round_or_none((row["price_cov"] or 0) * 100, 1),
+                    "priceRecordCount": int(row["price_records"] or 0),
                 }
             )
         return records
@@ -194,6 +355,8 @@ class FoodAtlasStore:
                     pl.col("energy_kcal_100g").mean().alias("energy"),
                     pl.col("nutriscore_num").mean().alias("nutriscore"),
                     pl.col("nova_group").mean().alias("nova"),
+                    pl.col("peer_anomaly_score").mean().alias("anomaly"),
+                    pl.col("price_eur_clean").is_not_null().mean().alias("price_cov"),
                 ]
             )
             .sort("samples", descending=True)
@@ -214,6 +377,8 @@ class FoodAtlasStore:
                     "energy": round_or_none(row["energy"], 1),
                     "nutriscore": round_or_none(row["nutriscore"], 2),
                     "nova": round_or_none(row["nova"], 2),
+                    "anomaly": round_or_none(row["anomaly"], 3),
+                    "priceCov": round_or_none((row["price_cov"] or 0) * 100, 1),
                 }
             )
         return records
@@ -222,7 +387,9 @@ class FoodAtlasStore:
         return {
             "countries": self.countries,
             "categories": self.categories,
+            "supportedCurrencies": ["EUR"],
             "defaultPriceCurrency": "EUR",
+            "totalProducts": self.products.height,
         }
 
     def _filter_products(
@@ -245,7 +412,7 @@ class FoodAtlasStore:
                 return df.head(0)
             df = df.filter(pl.col("analysis_category_tag") == category_tag)
         if priced_only:
-            df = df.filter(pl.col("has_price") & pl.col("currency").is_not_null())
+            df = df.filter(pl.col("price_eur_clean").is_not_null())
         return df
 
     def _sampling_groups(self, country_en: str | None, category_en: str | None) -> list[str]:
@@ -316,19 +483,6 @@ class FoodAtlasStore:
             merged = merged.head(limit)
         return merged
 
-    def _dominant_currency(self, df: pl.DataFrame) -> str | None:
-        if df.height == 0:
-            return None
-        currency_counts = (
-            df.group_by("currency")
-            .len()
-            .filter(pl.col("currency").is_not_null())
-            .sort("len", descending=True)
-        )
-        if currency_counts.height == 0:
-            return None
-        return currency_counts.item(0, "currency")
-
     def _product_records(self, df: pl.DataFrame) -> list[dict[str, Any]]:
         records: list[dict[str, Any]] = []
         for row in df.iter_rows(named=True):
@@ -345,7 +499,7 @@ class FoodAtlasStore:
                 {
                     "id": row["code"],
                     "name": row["product_name"] or row["code"],
-                    "brand": row["primary_brand_tag"],
+                    "brand": brand_display(row["primary_brand_tag"]),
                     "country": country_meta["enName"],
                     "countryLabel": country_meta["name"],
                     "category": category_meta["enName"],
@@ -354,8 +508,8 @@ class FoodAtlasStore:
                     "salt": round_or_none(row["salt_equivalent_100g"], 3),
                     "fat": round_or_none(row["fat_100g"], 2),
                     "health": round_or_none(row["health_score_composite"], 3),
-                    "price": round_or_none(row["price_median_clean"], 2),
-                    "currency": row["currency"],
+                    "price": round_or_none(row["price_eur_clean"], 2),
+                    "currency": "EUR" if row["price_eur_clean"] is not None else None,
                     "anomaly": round_or_none(row["peer_anomaly_score"], 3),
                     "flags": flags,
                     "nutriscore": (row["nutriscore_grade"] or "").upper() or None,
@@ -366,6 +520,23 @@ class FoodAtlasStore:
                     "qualityWarnings": row["quality_warning_count"],
                     "qualityErrors": row["quality_error_count"],
                     "priceRecordCount": row["price_record_count"],
+                    "flag": (
+                        "high"
+                        if (
+                            (row["peer_anomaly_score"] or 0) >= 2.25
+                            or row["flag_high_price_low_health"]
+                            or row["flag_high_sugar_high_nova"]
+                        )
+                        else (
+                            "warn"
+                            if (
+                                (row["peer_anomaly_score"] or 0) >= 1.45
+                                or row["flag_low_completeness_many_warnings"]
+                                or (row["quality_warning_count"] or 0) >= 2
+                            )
+                            else "good"
+                        )
+                    ),
                 }
             )
         return records
@@ -403,19 +574,124 @@ class FoodAtlasStore:
             category_en=category_en,
             priced_only=True,
         )
-        target_currency = currency or self._dominant_currency(filtered) or "EUR"
-        filtered = filtered.filter(pl.col("currency") == target_currency)
         sampled = self._sample_records(
             filtered,
             limit=limit,
             group_cols=self._sampling_groups(country_en, category_en),
-            priority_col="price_median_clean",
+            priority_col="price_eur_clean",
         )
         return {
-            "currency": target_currency,
+            "currency": "EUR",
             "total": filtered.height,
             "sampled": filtered.height > sampled.height,
             "products": self._product_records(sampled),
+        }
+
+    def brand_bubbles(
+        self,
+        *,
+        country_en: str | None = None,
+        category_en: str | None = None,
+        brand_query: str | None = None,
+        x_metric: str = "health",
+        y_metric: str = "price",
+        min_products: int = 10,
+        priced_min: int = 3,
+        multi_category_min: int = 2,
+        limit: int = 120,
+    ) -> dict[str, Any]:
+        filtered = self._filter_products(country_en=country_en, category_en=category_en)
+        filtered = filtered.filter(pl.col("brand_tag").is_not_null())
+        if brand_query:
+            query = brand_query.strip().lower()
+            if query:
+                filtered = filtered.filter(
+                    pl.col("brand_name").str.to_lowercase().str.contains(query, literal=True)
+                )
+
+        filtered = add_display_anomaly_column(filtered)
+
+        x_meta = BRAND_METRIC_META.get(x_metric) or BRAND_METRIC_META["health"]
+        y_meta = BRAND_METRIC_META.get(y_metric) or BRAND_METRIC_META["price"]
+
+        def metric_expr(metric_key: str) -> pl.Expr:
+            if metric_key in {"sugars", "salt", "fat", "energy"}:
+                return pl.col(BRAND_METRIC_META[metric_key]["column"]).median().alias(metric_key)
+            return pl.col(BRAND_METRIC_META[metric_key]["column"]).mean().alias(metric_key)
+
+        grouped = (
+            filtered.group_by(["brand_tag", "brand_name"])
+            .agg(
+                [
+                    pl.len().alias("products"),
+                    pl.col("analysis_category_tag").n_unique().alias("categories"),
+                    pl.col("analysis_country_tag").n_unique().alias("countries"),
+                    pl.col("price_eur_clean").is_not_null().sum().alias("priced_products"),
+                    pl.col("price_eur_clean").is_not_null().mean().alias("price_cov"),
+                    pl.col("analysis_category_tag")
+                    .mode()
+                    .first()
+                    .alias("dominant_category_tag"),
+                    metric_expr("health"),
+                    metric_expr("anomaly"),
+                    metric_expr("completeness"),
+                    metric_expr("nutriscore_num"),
+                    metric_expr("nova"),
+                    metric_expr("price"),
+                    metric_expr("sugars"),
+                    metric_expr("salt"),
+                    metric_expr("fat"),
+                    metric_expr("energy"),
+                ]
+            )
+        )
+
+        if not category_en:
+            grouped = grouped.filter(pl.col("categories") >= max(1, multi_category_min))
+        grouped = grouped.filter(pl.col("products") >= max(1, min_products))
+
+        if y_metric == "price" or x_metric == "price":
+            grouped = grouped.filter(pl.col("priced_products") >= max(1, priced_min))
+
+        grouped = grouped.filter(
+            pl.col(x_metric).is_not_null() & pl.col(y_metric).is_not_null()
+        )
+
+        if limit > 0:
+            grouped = grouped.sort(["products", "priced_products"], descending=[True, True]).head(limit)
+
+        records: list[dict[str, Any]] = []
+        for row in grouped.iter_rows(named=True):
+            dominant_category = category_display(row["dominant_category_tag"]) if row["dominant_category_tag"] else {"name": "", "enName": "", "parent": ""}
+            records.append(
+                {
+                    "brand": row["brand_name"],
+                    "brandTag": row["brand_tag"],
+                    "products": int(row["products"]),
+                    "categories": int(row["categories"]),
+                    "countries": int(row["countries"]),
+                    "pricedProducts": int(row["priced_products"]),
+                    "priceCoverage": round_or_none((row["price_cov"] or 0) * 100, 1),
+                    "dominantCategory": dominant_category["enName"],
+                    "dominantCategoryLabel": dominant_category["name"],
+                    "health": round_or_none(row["health"], 3),
+                    "anomaly": round_or_none(row["anomaly"], 3),
+                    "completeness": round_or_none(row["completeness"], 3),
+                    "nutriscore_num": round_or_none(row["nutriscore_num"], 3),
+                    "nova": round_or_none(row["nova"], 3),
+                    "price": round_or_none(row["price"], 2),
+                    "sugars": round_or_none(row["sugars"], 2),
+                    "salt": round_or_none(row["salt"], 3),
+                    "fat": round_or_none(row["fat"], 2),
+                    "energy": round_or_none(row["energy"], 1),
+                }
+            )
+
+        return {
+            "xMetric": x_metric,
+            "yMetric": y_metric,
+            "totalProducts": filtered.height,
+            "brands": records,
         }
 
 
@@ -463,5 +739,31 @@ def api_products_price() -> Any:
     )
 
 
+@app.get("/api/brands/bubbles")
+def api_brands_bubbles() -> Any:
+    country = request.args.get("country") or None
+    category = request.args.get("category") or None
+    brand_query = request.args.get("brand") or None
+    x_metric = request.args.get("x_metric") or "health"
+    y_metric = request.args.get("y_metric") or "price"
+    min_products = request.args.get("min_products", type=int) or 10
+    priced_min = request.args.get("priced_min", type=int) or 3
+    multi_category_min = request.args.get("multi_category_min", type=int) or 2
+    limit = request.args.get("limit", type=int) or 120
+    return jsonify(
+        store.brand_bubbles(
+            country_en=country,
+            category_en=category,
+            brand_query=brand_query,
+            x_metric=x_metric,
+            y_metric=y_metric,
+            min_products=min_products,
+            priced_min=priced_min,
+            multi_category_min=multi_category_min,
+            limit=limit,
+        )
+    )
+
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8091, debug=False)
+    app.run(host="127.0.0.1", port=8094, debug=False)

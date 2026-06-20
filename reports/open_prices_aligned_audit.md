@@ -1,48 +1,48 @@
 # Open Prices Aligned Audit
 
-Generated at: `2026-06-08T09:07:24`
+Generated at: `2026-06-20T16:11:10`
 
-- Aligned price rows: **113,153**
-- Unique preprocessed products with price records: **39,917**
-- Share of preprocessed products with prices: **9.97%**
-- Same-market rows: **96,570**
-- Same-market row share: **85.34%**
-- Same-market rows with non-null currency: **96,499**
-- Same-market usable row share: **85.28%**
-- Unique products with same-market usable prices: **34,852**
-- Share of preprocessed products with same-market usable prices: **8.70%**
-- Aggregated product/currency/country price groups: **41,208**
+- Aligned price rows: **139,837**
+- Unique preprocessed products with price records: **50,058**
+- Share of preprocessed products with prices: **10.09%**
+- Same-market rows: **120,824**
+- Same-market row share: **86.40%**
+- Same-market rows with non-null currency: **120,745**
+- Same-market usable row share: **86.35%**
+- Unique products with same-market usable prices: **44,254**
+- Share of preprocessed products with same-market usable prices: **8.92%**
+- Aggregated product/currency/country price groups: **51,513**
 
 ## Top Currencies
 
 | Currency | Rows | Median price | Mean price |
 |---|---:|---:|---:|
-| `EUR` | 101,828 | 2.390 | 2.825 |
-| `USD` | 7,426 | 4.990 | 5.863 |
-| `NOK` | 1,201 | 33.700 | 41.794 |
-| `GBP` | 1,004 | 1.800 | 2.298 |
-| `CHF` | 392 | 2.800 | 3.459 |
-| `CAD` | 288 | 3.500 | 4.639 |
-| `SEK` | 264 | 27.350 | 27.710 |
-| `PLN` | 147 | 7.450 | 9.439 |
-| `TWD` | 93 | 139.000 | 150.065 |
-| `None` | 88 | 1.585 | 2.826 |
-| `MXN` | 67 | 42.000 | 45.807 |
-| `ILS` | 36 | 11.000 | 12.415 |
+| `EUR` | 126,507 | 2.500 | 2.979 |
+| `USD` | 8,546 | 4.990 | 5.912 |
+| `NOK` | 1,533 | 34.900 | 47.240 |
+| `GBP` | 1,297 | 1.990 | 2.442 |
+| `CHF` | 461 | 2.950 | 3.654 |
+| `SEK` | 320 | 26.400 | 28.000 |
+| `CAD` | 314 | 3.500 | 4.980 |
+| `PLN` | 172 | 7.990 | 9.969 |
+| `TWD` | 111 | 159.000 | 157.820 |
+| `None` | 97 | 1.790 | 2.998 |
+| `MXN` | 67 | 43.000 | 47.455 |
+| `ADP` | 37 | 2.890 | 72.143 |
 
 ## Top Price Location Countries
 
 | Country code | Rows |
 |---|---:|
-| `FR` | 92,334 |
-| `US` | 7,340 |
-| `DE` | 6,511 |
-| `NO` | 1,201 |
-| `GB` | 1,047 |
-| `BE` | 639 |
-| `IT` | 611 |
-| `None` | 442 |
-| `CH` | 396 |
-| `ES` | 376 |
-| `AT` | 370 |
-| `CA` | 289 |
+| `FR` | 115,118 |
+| `US` | 8,449 |
+| `DE` | 7,929 |
+| `NO` | 1,533 |
+| `GB` | 1,343 |
+| `BE` | 759 |
+| `IT` | 696 |
+| `None` | 489 |
+| `ES` | 483 |
+| `CH` | 466 |
+| `AT` | 413 |
+| `SE` | 318 |
