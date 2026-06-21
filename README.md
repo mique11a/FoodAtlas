@@ -80,6 +80,8 @@ FoodAtlas/
 ```
 
 ## 主要脚本
+- `app.py`
+  作用：启动前后端
 
 - `scripts/download_dataset.py`
   作用：下载 Open Food Facts 数据集到 `datasets_raw/`。
@@ -100,6 +102,14 @@ FoodAtlas/
   作用：将 Parquet 导出为 CSV，当前用于导出 `products_analysis.parquet`。
 
 ## 常用命令
+
+### 0. 启动项目并进行分析
+
+```bash
+conda activate foodatlas
+python app.py
+```
+如果使用vscode作为ide，则在弹出的弹窗中选择`在浏览器中打开`，否则访问本地的8094端口查看前端页面，如遇端口冲突可自行修改`app.py`最后运行时设置的前端端口号
 
 ### 1. 重新审计原始数据
 
