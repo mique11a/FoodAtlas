@@ -1,39 +1,39 @@
 # Preprocessing Summary
 
-Generated at: `2026-06-08T09:07:24`
+Generated at: `2026-06-20T16:11:10`
 
 - Raw product rows: **4,503,112**
-- Preprocessed product rows: **400,539**
-- Share of raw products: **8.89%**
-- Products with at least one aligned price record: **39,917**
-- Share of preprocessed products with prices: **9.97%**
+- Preprocessed product rows: **495,997**
+- Share of raw products: **11.01%**
+- Products with at least one aligned price record: **50,058**
+- Share of preprocessed products with prices: **10.09%**
 
 ## Selected Top Countries
 
 | Country tag | Rows |
 |---|---:|
-| `en:france` | 160,329 |
-| `en:united-states` | 102,375 |
-| `en:germany` | 49,152 |
-| `en:spain` | 19,606 |
-| `en:united-kingdom` | 17,782 |
-| `en:italy` | 14,278 |
-| `en:switzerland` | 6,996 |
-| `en:belgium` | 14,855 |
-| `en:netherlands` | 7,172 |
-| `en:canada` | 7,994 |
+| `en:france` | 217,645 |
+| `en:united-states` | 108,069 |
+| `en:germany` | 61,012 |
+| `en:spain` | 23,425 |
+| `en:united-kingdom` | 23,544 |
+| `en:italy` | 16,962 |
+| `en:switzerland` | 8,809 |
+| `en:belgium` | 18,503 |
+| `en:netherlands` | 8,879 |
+| `en:canada` | 9,149 |
 
-## Selected Top Categories
+## Selected Analysis Categories
 
 | Category tag | Rows |
 |---|---:|
-| `en:plant-based-foods-and-beverages` | 1,159 |
-| `en:plant-based-foods` | 88,463 |
-| `en:snacks` | 33,134 |
-| `en:sweet-snacks` | 95,739 |
-| `en:cereals-and-potatoes` | 64,422 |
-| `en:dairies` | 11,077 |
-| `en:beverages` | 36,704 |
-| `en:fermented-foods` | 577 |
-| `en:desserts` | 42,494 |
-| `en:fermented-milk-products` | 26,770 |
+| `en:sugary-snacks` | 110,408 |
+| `en:appetizers` | 14,181 |
+| `en:salty-snacks` | 15,846 |
+| `en:beverages` | 46,136 |
+| `en:cereals-and-potatoes` | 70,003 |
+| `en:milk-and-dairy-products` | 61,572 |
+| `en:fish-meat-eggs` | 56,714 |
+| `en:fruits-and-vegetables` | 35,246 |
+| `en:fats-and-sauces` | 44,238 |
+| `en:composite-foods` | 41,653 |

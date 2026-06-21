@@ -40,6 +40,19 @@ COUNTRY_TAG_TO_CODE = {
     "en:poland": "PL",
 }
 
+ANALYSIS_CATEGORY_PRIORITY = [
+    "en:sugary-snacks",
+    "en:appetizers",
+    "en:salty-snacks",
+    "en:beverages",
+    "en:cereals-and-potatoes",
+    "en:milk-and-dairy-products",
+    "en:fish-meat-eggs",
+    "en:fruits-and-vegetables",
+    "en:fats-and-sauces",
+    "en:composite-foods",
+]
+
 
 def has_list(col: str) -> pl.Expr:
     return pl.col(col).is_not_null() & (pl.col(col).list.len() > 0)
@@ -94,6 +107,22 @@ def last_matching_tag(col: str, allowed: list[str]) -> pl.Expr:
         )
         .list.drop_nulls()
         .list.last()
+    )
+
+
+def first_priority_match(col: str, priority: list[str]) -> pl.Expr:
+    return pl.coalesce(
+        [
+            pl.when(
+                pl.col(col)
+                .list.eval(pl.element() == tag)
+                .list.any()
+                .fill_null(False)
+            )
+            .then(pl.lit(tag))
+            .otherwise(None)
+            for tag in priority
+        ]
     )
 
 
@@ -189,7 +218,11 @@ def top_tags(product_lf: pl.LazyFrame, filter_expr: pl.Expr, col: str, limit: in
     return df[col].to_list()
 
 
-def build_products(product_lf: pl.LazyFrame, allowed_countries: list[str], allowed_categories: list[str]) -> pl.LazyFrame:
+def build_products(
+    product_lf: pl.LazyFrame,
+    allowed_countries: list[str],
+    analysis_categories: list[str],
+) -> pl.LazyFrame:
     schema = product_lf.collect_schema()
     base_filter = product_filter_expr(schema)
     final_filter = (
@@ -198,8 +231,8 @@ def build_products(product_lf: pl.LazyFrame, allowed_countries: list[str], allow
         .list.eval(pl.element().is_in(allowed_countries))
         .list.any()
         .fill_null(False)
-        & pl.col("categories_tags")
-        .list.eval(pl.element().is_in(allowed_categories))
+        & pl.col("food_groups_tags")
+        .list.eval(pl.element().is_in(analysis_categories))
         .list.any()
         .fill_null(False)
     )
@@ -223,7 +256,7 @@ def build_products(product_lf: pl.LazyFrame, allowed_countries: list[str], allow
                 first_matching_tag("countries_tags", allowed_countries).alias(
                     "analysis_country_tag"
                 ),
-                last_matching_tag("categories_tags", allowed_categories).alias(
+                first_priority_match("food_groups_tags", analysis_categories).alias(
                     "analysis_category_tag"
                 ),
                 first_struct_text("ingredients_text").alias("ingredients_text"),
@@ -441,14 +474,9 @@ def main() -> None:
         limit=10,
         exclude={"en:world"},
     )
-    top_categories = top_tags(
-        product_lf,
-        filter_expr,
-        "categories_tags",
-        limit=10,
-    )
+    analysis_categories = ANALYSIS_CATEGORY_PRIORITY
 
-    products_lf = build_products(product_lf, top_countries, top_categories)
+    products_lf = build_products(product_lf, top_countries, analysis_categories)
     products_lf.sink_parquet(PRODUCTS_OUT)
 
     products = pl.scan_parquet(PRODUCTS_OUT)
@@ -522,7 +550,7 @@ def main() -> None:
         "output_prices_path": str(PRICES_OUT),
         "output_price_summary_path": str(PRICE_SUMMARY_OUT),
         "selected_top_countries": top_countries,
-        "selected_top_categories": top_categories,
+        "selected_analysis_categories": analysis_categories,
         "total_raw_product_rows": int(total_rows),
         "preprocessed_product_rows": int(product_rows),
         "preprocessed_product_pct_total": pct(int(product_rows), int(total_rows)),
@@ -553,9 +581,9 @@ def main() -> None:
     country_counts = {row["analysis_country_tag"]: row["len"] for row in aligned_product_countries}
     for tag in top_countries:
         preprocess_lines.append(f"| `{tag}` | {country_counts.get(tag, 0):,} |")
-    preprocess_lines.extend(["", "## Selected Top Categories", "", "| Category tag | Rows |", "|---|---:|"])
+    preprocess_lines.extend(["", "## Selected Analysis Categories", "", "| Category tag | Rows |", "|---|---:|"])
     category_counts = {row["analysis_category_tag"]: row["len"] for row in aligned_categories}
-    for tag in top_categories:
+    for tag in analysis_categories:
         preprocess_lines.append(f"| `{tag}` | {category_counts.get(tag, 0):,} |")
     write_markdown(PREPROCESS_REPORT_MD, preprocess_lines)
 
